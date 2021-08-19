@@ -25,7 +25,7 @@ class Myapp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: Myconstant.appname,
+      title: Myconstant.appName,
       routes: map,
       initialRoute: initialRoute,
     );

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class Myconstant {
   // General
-  static String appname = 'TU2HAND';
+  static String appName = 'TU2HAND';
 
   // Route
   static String routeAuthen = '/authen';
@@ -15,4 +15,26 @@ class Myconstant {
   static String image2 = 'images/image2.png';
   static String image3 = 'images/image3.png';
   static String image4 = 'images/image4.png';
+
+  //Color
+  static Color primary = Color(0xffef534e);
+  static Color dark = Color(0xffb61825);
+  static Color light = Color(0xffff867a);
+
+  // Style
+  TextStyle h1Style() => TextStyle(
+        fontSize: 24,
+        color: dark,
+        fontWeight: FontWeight.bold,
+      );
+  TextStyle h2Style() => TextStyle(
+        fontSize: 18,
+        color: dark,
+        fontWeight: FontWeight.w700,
+      );
+  TextStyle h3Style() => TextStyle(
+        fontSize: 14,
+        color: dark,
+        fontWeight: FontWeight.normal,
+      );
 }
