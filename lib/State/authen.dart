@@ -18,14 +18,52 @@ class _AuthenState extends State<Authen> {
     double size = MediaQuery.of(context).size.width;
     return Scaffold(
       body: SafeArea(
-          child: ListView(
-        children: [
-          buildImage(size),
-          buildAppName(),
-          buildUser(size),
-          buildPassword(size)
-        ],
+          child: GestureDetector(
+        onTap: () => FocusScope.of(context).requestFocus(FocusNode()),
+        behavior: HitTestBehavior.opaque,
+        child: ListView(
+          children: [
+            buildImage(size),
+            buildAppName(),
+            buildUser(size),
+            buildPassword(size),
+            buildLogin(size),
+            buildCreateAccount(),
+          ],
+        ),
       )),
+    );
+  }
+
+  Row buildCreateAccount() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        ShowTitle(
+          title: 'Non Account ?',
+          textStyle: Myconstant().h3Style(),
+        ),
+        TextButton(
+          onPressed: () => Navigator.pushNamed(context, Myconstant.routeCreateAccount),
+          child: Text('Create Account'),
+        ),
+      ],
+    );
+  }
+
+  Row buildLogin(double size) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Container(
+            margin: EdgeInsets.symmetric(vertical: 16),
+            width: size * 0.6,
+            child: ElevatedButton(
+              style: Myconstant().myButtonStyle(),
+              onPressed: () {},
+              child: Text('Login'),
+            )),
+      ],
     );
   }
 
@@ -118,7 +156,7 @@ class _AuthenState extends State<Authen> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Container(width: size * 0.6, child: showImage(path: Myconstant.image1)),
+        Container(width: size * 0.9, child: showImage(path: Myconstant.image5)),
       ],
     );
   }

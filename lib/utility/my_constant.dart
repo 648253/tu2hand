@@ -15,6 +15,7 @@ class Myconstant {
   static String image2 = 'images/image2.png';
   static String image3 = 'images/image3.png';
   static String image4 = 'images/image4.png';
+  static String image5 = 'images/image5.png';
 
   //Color
   static Color primary = Color(0xffef534e);
@@ -36,5 +37,12 @@ class Myconstant {
         fontSize: 14,
         color: dark,
         fontWeight: FontWeight.normal,
+      );
+
+  ButtonStyle myButtonStyle() => ElevatedButton.styleFrom(
+        primary: Myconstant.primary,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(30),
+        ),
       );
 }
