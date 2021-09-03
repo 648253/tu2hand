@@ -16,6 +16,7 @@ class Myconstant {
   static String image3 = 'images/image3.png';
   static String image4 = 'images/image4.png';
   static String image5 = 'images/image5.png';
+  static String avatar = 'images/avatar.png';
 
   //Color
   static Color primary = Color(0xffef534e);

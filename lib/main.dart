@@ -16,11 +16,11 @@ String? initialRoute;
 
 void main() {
   initialRoute = Myconstant.routeAuthen;
-  runApp(Myapp());
+  runApp(MyApp());
 }
 
-class Myapp extends StatelessWidget {
-  const Myapp({Key? key}) : super(key: key);
+class MyApp extends StatelessWidget {
+  const MyApp({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
