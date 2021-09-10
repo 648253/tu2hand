@@ -1,8 +1,10 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:myfirstpro/utility/my_constant.dart';
+import 'package:myfirstpro/utility/my_dialog.dart';
 import 'package:myfirstpro/widgets/show_image.dart';
 import 'package:myfirstpro/widgets/show_title.dart';
 
@@ -17,6 +19,25 @@ class _CreateAccountState extends State<CreateAccount> {
   String? typeUser;
   File? file;
   bool statusRedEyes = true;
+
+  @override
+  void initState() {
+    super.initState();
+    findLatLong();
+  }
+
+  Future<Null> findLatLong() async {
+    bool locationSevice;
+    LocationPermission locationPermission;
+
+    locationSevice = await Geolocator.isLocationServiceEnabled();
+    if (locationSevice) {
+      print('Sevice Location Open');
+    } else {
+      print('Sevice Location Close');
+      MyDialog().alertLocationService(context);
+    }
+  }
 
   Row buildName(double size) {
     return Row(
@@ -215,7 +236,7 @@ class _CreateAccountState extends State<CreateAccount> {
 
   Future<Null> chooseImage(ImageSource source) async {
     try {
-      var result = await ImagePicker().getImage(
+      var result = await ImagePicker().pickImage(
         source: source,
         maxWidth: 800,
         maxHeight: 800,
