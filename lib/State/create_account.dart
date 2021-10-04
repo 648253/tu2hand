@@ -2,10 +2,12 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:myfirstpro/utility/my_constant.dart';
 import 'package:myfirstpro/utility/my_dialog.dart';
 import 'package:myfirstpro/widgets/show_image.dart';
+import 'package:myfirstpro/widgets/show_progress.dart';
 import 'package:myfirstpro/widgets/show_title.dart';
 
 class CreateAccount extends StatefulWidget {
@@ -19,23 +21,67 @@ class _CreateAccountState extends State<CreateAccount> {
   String? typeUser;
   File? file;
   bool statusRedEyes = true;
+  double? lat, long;
+  final formKey = GlobalKey<FormState>();
 
   @override
   void initState() {
     super.initState();
-    findLatLong();
+    checkPermission();
   }
 
-  Future<Null> findLatLong() async {
+  Future<Null> checkPermission() async {
     bool locationSevice;
+    // ignore: unused_local_variable
     LocationPermission locationPermission;
 
     locationSevice = await Geolocator.isLocationServiceEnabled();
     if (locationSevice) {
       print('Sevice Location Open');
+
+      locationPermission = await Geolocator.checkPermission();
+      if (locationPermission == LocationPermission.denied) {
+        locationPermission = await Geolocator.requestPermission();
+        if (locationPermission == LocationPermission.deniedForever) {
+          MyDialog().alertLocationService(
+              context, 'ไม่อนุญาตแชร์ Location', 'โปรดแชร์ Location');
+        } else {
+          // Find Lat Long
+          findLatLong();
+        }
+      } else {
+        if (locationPermission == LocationPermission.deniedForever) {
+          MyDialog().alertLocationService(
+              context, 'ไม่อนญาตแชร์ Location', 'โปรดแชร์ Location');
+        } else {
+          // Find Lat Long
+          findLatLong();
+        }
+      }
     } else {
       print('Sevice Location Close');
-      MyDialog().alertLocationService(context);
+      MyDialog().alertLocationService(context, 'Location Service is closed ?',
+          'Please Open Location Sevice');
+    }
+  }
+
+  Future<Null> findLatLong() async {
+    print('findLatLong ==> Work');
+    Position? position = await findPosition();
+    setState(() {
+      lat = position!.latitude;
+      long = position.longitude;
+      print('lat = $lat,long = $long');
+    });
+  }
+
+  Future<Position?> findPosition() async {
+    Position position;
+    try {
+      position = await Geolocator.getCurrentPosition();
+      return position;
+    } catch (e) {
+      return null;
     }
   }
 
@@ -47,6 +93,11 @@ class _CreateAccountState extends State<CreateAccount> {
           margin: EdgeInsets.only(top: 16),
           width: size * 0.6,
           child: TextFormField(
+            validator: (value) {
+              if (value!.isEmpty) {
+                return 'กรุณาระบุส่วนนี้';
+              } else {}
+            },
             decoration: InputDecoration(
               labelStyle: Myconstant().h3Style(),
               labelText: 'Name :',
@@ -75,6 +126,11 @@ class _CreateAccountState extends State<CreateAccount> {
           margin: EdgeInsets.only(top: 16),
           width: size * 0.6,
           child: TextFormField(
+            validator: (value) {
+              if (value!.isEmpty) {
+                return 'กรุณาระบุส่วนนี้';
+              } else {}
+            },
             maxLines: 3,
             decoration: InputDecoration(
               hintText: 'Address :',
@@ -107,6 +163,12 @@ class _CreateAccountState extends State<CreateAccount> {
           margin: EdgeInsets.only(top: 16),
           width: size * 0.6,
           child: TextFormField(
+            keyboardType: TextInputType.phone,
+            validator: (value) {
+              if (value!.isEmpty) {
+                return 'กรุณาระบุส่วนนี้';
+              } else {}
+            },
             decoration: InputDecoration(
               labelStyle: Myconstant().h3Style(),
               labelText: 'Phone :',
@@ -135,9 +197,14 @@ class _CreateAccountState extends State<CreateAccount> {
           margin: EdgeInsets.only(top: 16),
           width: size * 0.6,
           child: TextFormField(
+            validator: (value) {
+              if (value!.isEmpty) {
+                return 'กรุณาระบุส่วนนี้';
+              } else {}
+            },
             decoration: InputDecoration(
               labelStyle: Myconstant().h3Style(),
-              labelText: 'User :',
+              labelText: 'UserName :',
               prefixIcon: Icon(
                 Icons.perm_identity,
                 color: Myconstant.dark,
@@ -163,6 +230,11 @@ class _CreateAccountState extends State<CreateAccount> {
           margin: EdgeInsets.only(top: 16),
           width: size * 0.6,
           child: TextFormField(
+            validator: (value) {
+              if (value!.isEmpty) {
+                return 'กรุณาระบุส่วนนี้';
+              } else {}
+            },
             obscureText: statusRedEyes,
             decoration: InputDecoration(
               suffixIcon: IconButton(
@@ -206,33 +278,83 @@ class _CreateAccountState extends State<CreateAccount> {
 
     return Scaffold(
       appBar: AppBar(
+        actions: [
+          buildCreateNewAccount(),
+        ],
         title: Text('Create New Account'),
         backgroundColor: Myconstant.primary,
       ),
       body: GestureDetector(
         onTap: () => FocusScope.of(context).requestFocus(FocusNode()),
         behavior: HitTestBehavior.opaque,
-        child: ListView(
-          padding: EdgeInsets.all(16),
-          children: [
-            buildTitle('ข้อมูลทั่วไป :'),
-            buildName(size),
-            buildTitle('ประเภทผู้ใช้ :'),
-            buildRadioBuyer(size),
-            buildRadioSeller(size),
-            buildTitle('ข้อมูลพื้นฐาน'),
-            buildAddress(size),
-            buildPhone(size),
-            buildUser(size),
-            buildPassword(size),
-            buildTitle('รูปภาพ'),
-            buildSubTitle(),
-            buildAvatar(size),
-          ],
+        child: Form(
+          key: formKey,
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                buildTitle('ข้อมูลทั่วไป :'),
+                buildName(size),
+                buildTitle('ประเภทผู้ใช้ :'),
+                buildRadioBuyer(size),
+                buildRadioSeller(size),
+                buildTitle('ข้อมูลพื้นฐาน'),
+                buildAddress(size),
+                buildPhone(size),
+                buildUser(size),
+                buildPassword(size),
+                buildTitle('รูปภาพ'),
+                buildSubTitle(),
+                buildAvatar(size),
+                buildTitle('แสดงพิกัดตำแหน่งปัจจุบัน'),
+                buildMap(),
+              ],
+            ),
+          ),
         ),
       ),
     );
   }
+
+  IconButton buildCreateNewAccount() {
+    return IconButton(
+      onPressed: () {
+        if (formKey.currentState!.validate()) {
+          if (typeUser == null) {
+            print('Non Choose Type User');
+            MyDialog().normalDialog(
+                context, 'ยังไม่ได้เลือกชนิดผู้ใช้งาน', 'กรุณาเลือกชนิดของผู้ใช้งาน');
+          } else {
+            print('Process Insert to DATABASE');
+          }
+        }
+      },
+      icon: Icon(Icons.cloud_upload),
+    );
+  }
+
+  Set<Marker> setMarker() => <Marker>[
+        Marker(
+          markerId: MarkerId('id'),
+          position: LatLng(lat!, long!),
+          infoWindow: InfoWindow(
+              title: 'You are here', snippet: 'Lat = $lat,Long = $long'),
+        ),
+      ].toSet();
+
+  Widget buildMap() => Container(
+        width: double.infinity,
+        height: 200,
+        child: lat == null
+            ? ShowProgress()
+            : GoogleMap(
+                initialCameraPosition: CameraPosition(
+                  target: LatLng(lat!, long!),
+                  zoom: 16,
+                ),
+                onMapCreated: (controller) {},
+                markers: setMarker(),
+              ),
+      );
 
   Future<Null> chooseImage(ImageSource source) async {
     try {

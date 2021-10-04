@@ -7,19 +7,19 @@ import 'package:myfirstpro/widgets/show_image.dart';
 import 'package:myfirstpro/widgets/show_title.dart';
 
 class MyDialog {
-  Future<Null> alertLocationService(BuildContext context) async {
+  Future<Null> alertLocationService(
+      BuildContext context, String title, String message) async {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
         title: ListTile(
           leading: showImage(path: Myconstant.image6),
           title: ShowTitle(
-            title: 'Location Service is closed ?',
+            title: title,
             textStyle: Myconstant().h2Style(),
           ),
-          subtitle: ShowTitle(
-              title: 'Please Open Location Sevice',
-              textStyle: Myconstant().h3Style()),
+          subtitle:
+              ShowTitle(title: message, textStyle: Myconstant().h3Style()),
         ),
         actions: [
           TextButton(
@@ -29,6 +29,20 @@ class MyDialog {
               },
               child: Text('Ok'))
         ],
+      ),
+    );
+  }
+
+  Future<Null> normalDialog(
+      BuildContext context, String title, String message) async {
+    showDialog(
+      context: context,
+      builder: (context) => SimpleDialog(
+        title: ListTile(
+          leading: showImage(path: Myconstant.image6),
+          title: ShowTitle(title: title, textStyle: Myconstant().h3Style()),
+          subtitle: ShowTitle(title: message, textStyle: Myconstant().h3Style()),
+        ),children: [TextButton(onPressed: ()=> Navigator.pop(context), child: Text('OK'))],
       ),
     );
   }
