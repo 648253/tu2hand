@@ -4,7 +4,7 @@ class Myconstant {
   // General
   static String appName = 'TU2HAND';
   static String domain =
-      'https://bf5f-2405-9800-bc02-2945-f94e-68a3-2062-a836.ngrok.io';
+      'https://86f0-2405-9800-bc02-2945-9048-5369-ade-1ef5.ngrok.io';
 
   // Route
   static String routeAuthen = '/authen';
@@ -28,16 +28,16 @@ class Myconstant {
   static Color dark = Color(0xffb61825);
   static Color light = Color(0xffff867a);
   static Map<int, Color> mapMaterialColor = {
-    50:Color.fromRGBO(255, 182, 24,0.1),
-    100:Color.fromRGBO(255, 182, 24,0.2),
-    200:Color.fromRGBO(255, 182, 24,0.3),
-    300:Color.fromRGBO(255, 182, 24,0.4),
-    400:Color.fromRGBO(255, 182, 24,0.5),
-    500:Color.fromRGBO(255, 182, 24,0.6),
-    600:Color.fromRGBO(255, 182, 24,0.7),
-    700:Color.fromRGBO(255, 182, 24,0.8),
-    800:Color.fromRGBO(255, 182, 24,0.9),
-    900:Color.fromRGBO(255, 182, 24,1),
+    50: Color.fromRGBO(255, 182, 24, 0.1),
+    100: Color.fromRGBO(255, 182, 24, 0.2),
+    200: Color.fromRGBO(255, 182, 24, 0.3),
+    300: Color.fromRGBO(255, 182, 24, 0.4),
+    400: Color.fromRGBO(255, 182, 24, 0.5),
+    500: Color.fromRGBO(255, 182, 24, 0.6),
+    600: Color.fromRGBO(255, 182, 24, 0.7),
+    700: Color.fromRGBO(255, 182, 24, 0.8),
+    800: Color.fromRGBO(255, 182, 24, 0.9),
+    900: Color.fromRGBO(255, 182, 24, 1),
   };
 
   // Style

@@ -1,5 +1,12 @@
+import 'dart:ffi';
+import 'dart:io';
+import 'dart:math';
+
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:myfirstpro/utility/my_constant.dart';
+import 'package:myfirstpro/utility/my_dialog.dart';
 import 'package:myfirstpro/widgets/show_image.dart';
 import 'package:myfirstpro/widgets/show_title.dart';
 
@@ -12,11 +19,31 @@ class AddProduct extends StatefulWidget {
 
 class _AddProductState extends State<AddProduct> {
   final formKey = GlobalKey<FormState>();
+  List<File?> files = [];
+  File? file;
+
+  @override
+  void initState() {
+    super.initState();
+    initialFile();
+  }
+
+  void initialFile() {
+    for (var i = 0; i < 4; i++) {
+      files.add(null);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        actions: [
+          IconButton(
+            onPressed: () => processAddProduct(),
+            icon: Icon(Icons.cloud_upload),
+          ),
+        ],
         title: Text('Add Product'),
       ),
       body: LayoutBuilder(
@@ -51,12 +78,65 @@ class _AddProductState extends State<AddProduct> {
       child: ElevatedButton(
         style: Myconstant().myButtonStyle(),
         onPressed: () {
-          if (formKey.currentState!.validate()) {
-          } else {}
+          processAddProduct();
         },
         child: Text('Add Product'),
       ),
     );
+  }
+
+  Future<Null> processAddProduct() async {
+    if (formKey.currentState!.validate()) {
+      bool checkFile = true;
+      for (var item in files) {
+        if (item == null) {
+          checkFile = false;
+        }
+      }
+      if (checkFile) {
+        // print('## Choose Image Success');
+        MyDialog().showProgressDialog(context);
+
+        String apiSavePdImg = '${Myconstant.domain}/tu2hand/saveFilePD.php';
+        // print('## Call API');
+
+        int loop = 0;
+
+        for (var item in files) {
+          int i = Random().nextInt(10000000);
+          String fileName = 'pd_$i.jpg';
+          Map<String, dynamic> map = {};
+          map['file'] =
+              await MultipartFile.fromFile(item!.path, filename: fileName);
+          FormData data = FormData.fromMap(map);
+          await Dio().post(apiSavePdImg, data: data).then((value) {
+            print('Upload Success');
+            loop++;
+            if (loop >= files.length) {
+              Navigator.pop(context);
+            } else {}
+            
+          });
+        }
+      } else {
+        MyDialog()
+            .normalDialog(context, 'More Image', 'Please Choose More Image');
+      }
+    }
+  }
+
+  Future<Null> processImagePicker(ImageSource source, int index) async {
+    try {
+      var result = await ImagePicker().getImage(
+        source: source,
+        maxWidth: 800,
+        maxHeight: 800,
+      );
+      setState(() {
+        file = File(result!.path);
+        files[index] = file;
+      });
+    } catch (e) {}
   }
 
   Future<Null> chooseSourceImageDialog(int index) async {
@@ -66,9 +146,34 @@ class _AddProductState extends State<AddProduct> {
       builder: (context) => AlertDialog(
         title: ListTile(
           leading: showImage(path: Myconstant.image3),
-          title: ShowTitle(title: 'Source Image ${index+1} ?', textStyle: Myconstant().h2Style()),
-          subtitle: ShowTitle(title: 'Please Tap on camera or gallery', textStyle: Myconstant().h3Style()),
+          title: ShowTitle(
+              title: 'Source Image ${index + 1} ?',
+              textStyle: Myconstant().h2Style()),
+          subtitle: ShowTitle(
+              title: 'Please Tap on camera or gallery',
+              textStyle: Myconstant().h3Style()),
         ),
+        actions: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  processImagePicker(ImageSource.camera, index);
+                },
+                child: Text('Camera'),
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  processImagePicker(ImageSource.gallery, index);
+                },
+                child: Text('Gallery'),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
@@ -77,9 +182,10 @@ class _AddProductState extends State<AddProduct> {
     return Column(
       children: [
         Container(
-          width: constraints.maxWidth * 0.3,
-          height: constraints.maxWidth * 0.4,
-          child: Image.asset(Myconstant.image7),
+          width: constraints.maxWidth * 0.5,
+          height: constraints.maxWidth * 0.5,
+          child:
+              file == null ? Image.asset(Myconstant.image7) : Image.file(file!),
         ),
         Container(
           width: constraints.maxWidth * 0.7,
@@ -87,35 +193,55 @@ class _AddProductState extends State<AddProduct> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Container(
-                width: 40,
-                height: 35,
+                width: 45,
+                height: 45,
                 child: InkWell(
                   onTap: () => chooseSourceImageDialog(0),
-                  child: Image.asset(Myconstant.image7),
+                  child: files[0] == null
+                      ? Image.asset(Myconstant.image7)
+                      : Image.file(
+                          files[0]!,
+                          fit: BoxFit.cover,
+                        ),
                 ),
               ),
               Container(
-                width: 40,
-                height: 35,
+                width: 45,
+                height: 45,
                 child: InkWell(
                   onTap: () => chooseSourceImageDialog(1),
-                  child: Image.asset(Myconstant.image7),
+                  child: files[1] == null
+                      ? Image.asset(Myconstant.image7)
+                      : Image.file(
+                          files[1]!,
+                          fit: BoxFit.cover,
+                        ),
                 ),
               ),
               Container(
-                width: 40,
-                height: 35,
+                width: 45,
+                height: 45,
                 child: InkWell(
                   onTap: () => chooseSourceImageDialog(2),
-                  child: Image.asset(Myconstant.image7),
+                  child: files[2] == null
+                      ? Image.asset(Myconstant.image7)
+                      : Image.file(
+                          files[2]!,
+                          fit: BoxFit.cover,
+                        ),
                 ),
               ),
               Container(
-                width: 40,
-                height: 35,
+                width: 45,
+                height: 45,
                 child: InkWell(
                   onTap: () => chooseSourceImageDialog(3),
-                  child: Image.asset(Myconstant.image7),
+                  child: files[3] == null
+                      ? Image.asset(Myconstant.image7)
+                      : Image.file(
+                          files[3]!,
+                          fit: BoxFit.cover,
+                        ),
                 ),
               ),
             ],

@@ -376,7 +376,7 @@ class _CreateAccountState extends State<CreateAccount> {
           print('### process Upload Pic');
           String apiSaveUserImg = '${Myconstant.domain}/tu2hand/saveFile.php';
           int i = Random().nextInt(100000);
-          String nameImg = 'img$i.jpg';
+          String nameImg = 'profile_$i.jpg';
           Map<String, dynamic> map = Map();
           map['file'] =
               await MultipartFile.fromFile(file!.path, filename: nameImg);
