@@ -159,7 +159,7 @@ class _ShowProductSellerState extends State<ShowProductSeller> {
                               context,
                               MaterialPageRoute(
                                 builder: (context) => EditProduct(productModel: productModels[index],),
-                              ));
+                              )).then((value) => loadValueFromAPI());
                         },
                         icon: Icon(
                           Icons.edit_outlined,

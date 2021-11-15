@@ -1,10 +1,17 @@
+import 'dart:convert';
+
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:myfirstpro/bodys/show_manage_seller.dart';
 import 'package:myfirstpro/bodys/show_order_seller.dart';
 import 'package:myfirstpro/bodys/show_product_seller.dart';
+import 'package:myfirstpro/models/user_model.dart';
 import 'package:myfirstpro/utility/my_constant.dart';
+import 'package:myfirstpro/widgets/show_progress.dart';
 import 'package:myfirstpro/widgets/show_signout.dart';
 import 'package:myfirstpro/widgets/show_title.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SellerService extends StatefulWidget {
   const SellerService({Key? key}) : super(key: key);
@@ -20,11 +27,37 @@ class _SellerServiceState extends State<SellerService> {
     ShowProductSeller()
   ];
   int indexWidget = 0;
+  UserModel? userModel;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    findUserModel();
+  }
+
+  Future<Null> findUserModel() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    String id = preferences.getString('id')!;
+    print('## id login ==> $id');
+    String apiGetUserWhereId =
+        '${Myconstant.domain}/tu2hand/getUserWhereId.php?isAdd=true&id=$id';
+    await Dio().get(apiGetUserWhereId).then((value) {
+      print('## value ==> $value');
+      for (var item in json.decode(value.data)) {
+        setState(() {
+          userModel = UserModel.fromMap(item);
+          print('## name = ${userModel!.name} , img = ${userModel!.img}');
+        });
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(backgroundColor: Myconstant.dark,
+      appBar: AppBar(
+        backgroundColor: Myconstant.dark,
         title: Text('Seller'),
       ),
       drawer: Drawer(
@@ -33,7 +66,7 @@ class _SellerServiceState extends State<SellerService> {
             ShowSignOut(),
             Column(
               children: [
-                UserAccountsDrawerHeader(accountName: null, accountEmail: null),
+                buildHeader(),
                 menuShowOrder(),
                 menuShopManage(),
                 menuShowProduct(),
@@ -44,6 +77,39 @@ class _SellerServiceState extends State<SellerService> {
       ),
       body: widgets[indexWidget],
     );
+  }
+
+  String createUrl(String string) {
+    String result = string.substring(1, string.length - 1);
+    List<String> strings = result.split(',');
+    String url = '${Myconstant.domain}/tu2hand${strings[0]}';
+    return url;
+  }
+
+  UserAccountsDrawerHeader buildHeader() {
+    return UserAccountsDrawerHeader(
+        otherAccountsPictures: [
+          IconButton(
+            onPressed: () {},
+            icon: Icon(Icons.portrait),
+            iconSize: 36,
+            color: Myconstant.light,
+            tooltip: 'Edit Profile',
+          ),
+        ],
+        decoration: BoxDecoration(
+          gradient: RadialGradient(
+            colors: [Myconstant.light, Myconstant.dark],
+            center: Alignment(-0.7, -0.2),
+            radius: 1,
+          ),
+        ),
+        currentAccountPicture: CircleAvatar(
+          backgroundImage:
+              NetworkImage('${Myconstant.domain}${userModel!.img}'),
+        ),
+        accountName: Text(userModel == null ? 'Name ?' : userModel!.name),
+        accountEmail: Text(userModel == null ? 'Type ?' : userModel!.type));
   }
 
   ListTile menuShowOrder() {

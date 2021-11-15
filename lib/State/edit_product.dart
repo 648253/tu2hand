@@ -248,11 +248,11 @@ class _EditProductState extends State<EditProduct> {
     if (formKey.currentState!.validate()) {
       MyDialog().showProgressDialog(context);
 
-      String name = nameController.text;
-      String price = priceController.text;
-      String detail = detailController.text;
+      String namePd = nameController.text;
+      String pricePd = priceController.text;
+      String detailPd = detailController.text;
       String id = productModel!.id;
-      String images;
+      String imagesPd;
       if (statusImage) {
         //upload image & refesh array pathImages
         int index = 0;
@@ -273,16 +273,21 @@ class _EditProductState extends State<EditProduct> {
           }
           index++;
         }
-        images = pathImages.toString();
+        imagesPd = pathImages.toString();
         Navigator.pop(context);
       } else {
-        images = pathImages.toString();
+        imagesPd = pathImages.toString();
         Navigator.pop(context);
       }
 
       print('## statusImage = $statusImage');
-      print('## id = $id , name = $name, price = $price, detail = $detail');
-      print('## images = $images');
+      print(
+          '## id = $id , name = $namePd, price = $pricePd, detail = $detailPd');
+      print('## images = $imagesPd');
+
+      String apiEditProduct =
+          '${Myconstant.domain}/tu2hand/editProductWhereId.php?isAdd=true&id=$id&namePd=$namePd&pricePd=$pricePd&detailPd=$detailPd&imagesPd=$imagesPd';
+      await Dio().get(apiEditProduct).then((value) => Navigator.pop(context));
     }
   }
 }
