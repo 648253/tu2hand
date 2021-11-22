@@ -21,11 +21,7 @@ class SellerService extends StatefulWidget {
 }
 
 class _SellerServiceState extends State<SellerService> {
-  List<Widget> widgets = [
-    ShowOrderSeller(),
-    ShowMangeSeller(),
-    ShowProductSeller()
-  ];
+  List<Widget> widgets = [];
   int indexWidget = 0;
   UserModel? userModel;
 
@@ -47,7 +43,9 @@ class _SellerServiceState extends State<SellerService> {
       for (var item in json.decode(value.data)) {
         setState(() {
           userModel = UserModel.fromMap(item);
-          print('## name = ${userModel!.name} , img = ${userModel!.img}');
+          widgets.add(ShowOrderSeller());
+          widgets.add(ShowMangeSeller(userModel: userModel!));
+          widgets.add(ShowProductSeller());
         });
       }
     });
@@ -60,30 +58,25 @@ class _SellerServiceState extends State<SellerService> {
         backgroundColor: Myconstant.dark,
         title: Text('Seller'),
       ),
-      drawer: Drawer(
-        child: Stack(
-          children: [
-            ShowSignOut(),
-            Column(
-              children: [
-                buildHeader(),
-                menuShowOrder(),
-                menuShopManage(),
-                menuShowProduct(),
-              ],
+      drawer: widgets.length == 0
+          ? SizedBox()
+          : Drawer(
+              child: Stack(
+                children: [
+                  ShowSignOut(),
+                  Column(
+                    children: [
+                      buildHeader(),
+                      menuShowOrder(),
+                      menuShopManage(),
+                      menuShowProduct(),
+                    ],
+                  ),
+                ],
+              ),
             ),
-          ],
-        ),
-      ),
-      body: widgets[indexWidget],
+      body: widgets.length == 0 ? ShowProgress() : widgets[indexWidget],
     );
-  }
-
-  String createUrl(String string) {
-    String result = string.substring(1, string.length - 1);
-    List<String> strings = result.split(',');
-    String url = '${Myconstant.domain}/tu2hand${strings[0]}';
-    return url;
   }
 
   UserAccountsDrawerHeader buildHeader() {

@@ -4,7 +4,7 @@ class Myconstant {
   // General
   static String appName = 'TU2HAND';
   static String domain =
-      'https://8489-2405-9800-bc02-2945-697e-3c38-fe8b-c3f2.ngrok.io';
+      'https://8421-2405-9800-bc02-2945-4cb7-a57-1415-fc87.ngrok.io';
 
   // Route
   static String routeAuthen = '/authen';
