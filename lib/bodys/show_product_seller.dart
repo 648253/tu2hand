@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:myfirstpro/State/edit_product.dart';
+import 'package:myfirstpro/State/seller_edit_product.dart';
 import 'package:myfirstpro/models/product_model.dart';
 import 'package:myfirstpro/utility/my_constant.dart';
 import 'package:myfirstpro/widgets/show_image.dart';
@@ -147,7 +147,7 @@ class _ShowProductSellerState extends State<ShowProductSeller> {
                       title: 'Price ${productModels[index].pricePd} THB',
                       textStyle: Myconstant().h2Style()),
                   ShowTitle(
-                      title: productModels[index].detailPd,
+                      title: cutWord(productModels[index].detailPd),
                       textStyle: Myconstant().h3Style()),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -158,7 +158,7 @@ class _ShowProductSellerState extends State<ShowProductSeller> {
                           Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => EditProduct(productModel: productModels[index],),
+                                builder: (context) => SellerEditProduct(productModel: productModels[index],),
                               )).then((value) => loadValueFromAPI());
                         },
                         icon: Icon(
@@ -227,5 +227,14 @@ class _ShowProductSellerState extends State<ShowProductSeller> {
         ],
       ),
     );
+  }
+
+  cutWord(String detailPd) {
+    String result = detailPd;
+    if (result.length >= 100) {
+      result = result.substring(0, 100);
+      result = '$result ...';
+    }
+    return result;
   }
 }

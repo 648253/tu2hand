@@ -1,8 +1,8 @@
 import 'dart:convert';
 
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:myfirstpro/bodys/show_manage_seller.dart';
 import 'package:myfirstpro/bodys/show_order_seller.dart';
 import 'package:myfirstpro/bodys/show_product_seller.dart';
@@ -11,7 +11,7 @@ import 'package:myfirstpro/utility/my_constant.dart';
 import 'package:myfirstpro/widgets/show_progress.dart';
 import 'package:myfirstpro/widgets/show_signout.dart';
 import 'package:myfirstpro/widgets/show_title.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+
 
 class SellerService extends StatefulWidget {
   const SellerService({Key? key}) : super(key: key);

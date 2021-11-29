@@ -1,4 +1,3 @@
-import 'dart:ffi';
 import 'dart:io';
 import 'dart:math';
 
@@ -153,7 +152,7 @@ class _AddProductState extends State<AddProduct> {
 
   Future<Null> processImagePicker(ImageSource source, int index) async {
     try {
-      var result = await ImagePicker().getImage(
+      var result = await ImagePicker().pickImage(
         source: source,
         maxWidth: 800,
         maxHeight: 800,

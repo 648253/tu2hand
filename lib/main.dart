@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:myfirstpro/State/authen.dart';
 import 'package:myfirstpro/State/buyer_service.dart';
 import 'package:myfirstpro/State/create_account.dart';
+import 'package:myfirstpro/State/seller_edit_profile.dart';
 import 'package:myfirstpro/State/seller_service.dart';
 import 'package:myfirstpro/State/seller_service_addpd.dart';
+import 'package:myfirstpro/State/show_cart_buyer.dart';
 import 'package:myfirstpro/utility/my_constant.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -12,7 +14,9 @@ final Map<String, WidgetBuilder> map = {
   '/createAccount': (BuildContext context) => CreateAccount(),
   '/buyerService': (BuildContext context) => BuyerService(),
   '/sellerService': (BuildContext context) => SellerService(),
-  '/addProduct':(BuildContext context)=> AddProduct(),
+  '/addProduct': (BuildContext context) => AddProduct(),
+  '/editProfile': (BuildContext context) => SellerEditProfile(),
+  '/showCartBuyer': (BuildContext context) => ShowCartBuyer(),
 };
 
 String? initialRoute;

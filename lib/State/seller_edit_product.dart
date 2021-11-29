@@ -11,15 +11,15 @@ import 'package:myfirstpro/utility/my_dialog.dart';
 import 'package:myfirstpro/widgets/show_progress.dart';
 import 'package:myfirstpro/widgets/show_title.dart';
 
-class EditProduct extends StatefulWidget {
+class SellerEditProduct extends StatefulWidget {
   final ProductModel? productModel;
-  const EditProduct({Key? key, required this.productModel}) : super(key: key);
+  const SellerEditProduct({Key? key, required this.productModel}) : super(key: key);
 
   @override
-  _EditProductState createState() => _EditProductState();
+  _SellerEditProductState createState() => _SellerEditProductState();
 }
 
-class _EditProductState extends State<EditProduct> {
+class _SellerEditProductState extends State<SellerEditProduct> {
   ProductModel? productModel;
   TextEditingController nameController = TextEditingController();
   TextEditingController priceController = TextEditingController();
@@ -113,7 +113,7 @@ class _EditProductState extends State<EditProduct> {
   Future<Null> chooseImage(int index, ImageSource source) async {
     try {
       var result = await ImagePicker()
-          .getImage(source: source, maxHeight: 800, maxWidth: 800);
+          .pickImage(source: source, maxHeight: 800, maxWidth: 800);
       setState(() {
         files[index] = File(result!.path);
         statusImage = true;

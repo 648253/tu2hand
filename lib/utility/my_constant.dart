@@ -4,7 +4,7 @@ class Myconstant {
   // General
   static String appName = 'TU2HAND';
   static String domain =
-      'https://8421-2405-9800-bc02-2945-4cb7-a57-1415-fc87.ngrok.io';
+      'https://0e06-2405-9800-bc02-2945-ed92-25fd-289c-b2e6.ngrok.io';
 
   // Route
   static String routeAuthen = '/authen';
@@ -12,6 +12,8 @@ class Myconstant {
   static String routeBuyerService = '/buyerService';
   static String routeSellerService = '/sellerService';
   static String routeSellerServiceAddPd = '/addProduct';
+  static String routeSellerEditProfile = '/editProfile';
+  static String routeBuyerShowCart = '/showCartBuyer';
 
   //Image
   static String image1 = 'images/image1.png';
@@ -55,6 +57,17 @@ class Myconstant {
   TextStyle h2WStyle() => TextStyle(
         fontSize: 18,
         color: Colors.white,
+        fontWeight: FontWeight.w700,
+      );
+
+  TextStyle h3RStyle() => TextStyle(
+        fontSize: 14,
+        color: Colors.red.shade800,
+        fontWeight: FontWeight.w700,
+      );
+  TextStyle h2BStyle() => TextStyle(
+        fontSize: 18,
+        color: Colors.blue.shade800,
         fontWeight: FontWeight.w700,
       );
 
