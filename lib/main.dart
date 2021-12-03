@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:myfirstpro/State/add_wallet.dart';
 import 'package:myfirstpro/State/authen.dart';
 import 'package:myfirstpro/State/buyer_service.dart';
 import 'package:myfirstpro/State/create_account.dart';
@@ -17,6 +18,7 @@ final Map<String, WidgetBuilder> map = {
   '/addProduct': (BuildContext context) => AddProduct(),
   '/editProfile': (BuildContext context) => SellerEditProfile(),
   '/showCartBuyer': (BuildContext context) => ShowCartBuyer(),
+  '/addWallet':(BuildContext context) => AddWallet(),
 };
 
 String? initialRoute;

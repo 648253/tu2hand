@@ -4,7 +4,8 @@ class Myconstant {
   // General
   static String appName = 'TU2HAND';
   static String domain =
-      'https://0e06-2405-9800-bc02-2945-ed92-25fd-289c-b2e6.ngrok.io';
+      'https://7765-2405-9800-bc02-2945-6113-d254-2d9-94fc.ngrok.io';
+  static String urlQRcode = 'https://promptpay.io/0612019351.png';
 
   // Route
   static String routeAuthen = '/authen';
@@ -14,6 +15,7 @@ class Myconstant {
   static String routeSellerServiceAddPd = '/addProduct';
   static String routeSellerEditProfile = '/editProfile';
   static String routeBuyerShowCart = '/showCartBuyer';
+  static String routeAddWallet = '/addWallet';
 
   //Image
   static String image1 = 'images/image1.png';
@@ -24,6 +26,7 @@ class Myconstant {
   static String image6 = 'images/image6.png';
   static String image7 = 'images/image7.png';
   static String avatar = 'images/avatar.png';
+  static String promtpayImg = 'images/promptpay.png';
 
   //Color
   static Color primary = Color(0xffef534e);
@@ -48,6 +51,12 @@ class Myconstant {
         color: dark,
         fontWeight: FontWeight.bold,
       );
+  TextStyle h1BStyle() => TextStyle(
+        fontSize: 24,
+        color: Colors.black87,
+        fontWeight: FontWeight.bold,
+      );
+
   TextStyle h2Style() => TextStyle(
         fontSize: 18,
         color: dark,

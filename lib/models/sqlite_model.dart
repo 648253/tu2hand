@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 class SQLiteModel {
-  final int id;
+  int? id;
   final String idSeller;
   final String idPd;
   final String name;
@@ -9,7 +9,7 @@ class SQLiteModel {
   final String amount;
   final String sum;
   SQLiteModel({
-    required this.id,
+    this.id,
     required this.idSeller,
     required this.idPd,
     required this.name,

@@ -1,17 +1,22 @@
 import 'package:flutter/material.dart';
 
-class MyOrderBuyer extends StatefulWidget {
-  const MyOrderBuyer({ Key? key }) : super(key: key);
+
+class MyMoneyBuyer extends StatefulWidget {
+  const MyMoneyBuyer({Key? key}) : super(key: key);
 
   @override
-  _MyOrderBuyerState createState() => _MyOrderBuyerState();
+  _MyMoneyBuyerState createState() => _MyMoneyBuyerState();
 }
 
-class _MyOrderBuyerState extends State<MyOrderBuyer> {
+class _MyMoneyBuyerState extends State<MyMoneyBuyer> {
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Text('MyOrder'),
+      body: Text('MyMoney'),
     );
   }
+
+
 }

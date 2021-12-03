@@ -5,8 +5,11 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:myfirstpro/models/product_model.dart';
+import 'package:myfirstpro/models/sqlite_model.dart';
 import 'package:myfirstpro/models/user_model.dart';
 import 'package:myfirstpro/utility/my_constant.dart';
+import 'package:myfirstpro/utility/my_dialog.dart';
+import 'package:myfirstpro/utility/sqlite_helper.dart';
 import 'package:myfirstpro/widgets/show_image.dart';
 import 'package:myfirstpro/widgets/show_progress.dart';
 import 'package:myfirstpro/widgets/show_title.dart';
@@ -27,11 +30,28 @@ class _ShowProductBuyerState extends State<ShowProductBuyer> {
   List<List<String>> listImage = [];
   int indexImage = 0;
   int amountInt = 1;
+  String? currentIdSeller;
+
   @override
   void initState() {
     // TODO: implement initState
     userModel = widget.userModel;
     readAPI();
+    readCart();
+  }
+
+  Future<Null> readCart() async {
+    await SQLiteHelper().readSQLite().then((value) {
+      print('### value readCart == $value');
+      if (value.length != 0) {
+        List<SQLiteModel> models = [];
+        for (var model in value) {
+          models.add(model);
+        }
+        currentIdSeller = models[0].idSeller;
+        print('### currentIdSeller = $currentIdSeller');
+      }
+    });
   }
 
   Future<Null> readAPI() async {
@@ -254,7 +274,7 @@ class _ShowProductBuyerState extends State<ShowProductBuyer> {
               child: Row(
                 children: [
                   Container(
-                    width: 250,
+                    width: 220,
                     child: ShowTitle(
                         title: productModel.detailPd,
                         textStyle: Myconstant().h3Style()),
@@ -267,11 +287,14 @@ class _ShowProductBuyerState extends State<ShowProductBuyer> {
               children: [
                 IconButton(
                   onPressed: () {
-                    setState(() {
-                      amountInt++;
-                    });
+                    if (amountInt != 1) {
+                      setState(() {
+                        amountInt--;
+                      });
+                    }
                   },
-                  icon: Icon(Icons.add_circle_outline),
+
+                  icon: Icon(Icons.remove_circle_outline),
                   //color: Myconstant.dark,
                 ),
                 ShowTitle(
@@ -280,13 +303,11 @@ class _ShowProductBuyerState extends State<ShowProductBuyer> {
                 ),
                 IconButton(
                   onPressed: () {
-                    if (amountInt != 1) {
-                      setState(() {
-                        amountInt--;
-                      });
-                    }
+                    setState(() {
+                      amountInt++;
+                    });
                   },
-                  icon: Icon(Icons.remove_circle_outline),
+                  icon: Icon(Icons.add_circle_outline),
                   //color: Myconstant.dark,
                 ),
               ],
@@ -299,7 +320,36 @@ class _ShowProductBuyerState extends State<ShowProductBuyer> {
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
             TextButton(
-                onPressed: () => Navigator.pop(context),
+                onPressed: () async {
+                  String idSeller = userModel!.id;
+                  String idPd = productModel.id;
+                  String namePd = productModel.namePd;
+                  String pricePd = productModel.pricePd;
+                  String amountPd = amountInt.toString();
+                  String sumPd = (int.parse(pricePd) * amountInt).toString();
+                  
+                  if ((currentIdSeller == idSeller) ||
+                      (currentIdSeller == null)) {
+                    SQLiteModel sqLiteModel = SQLiteModel(
+                        idSeller: idSeller,
+                        idPd: idPd,
+                        name: namePd,
+                        price: pricePd,
+                        amount: amountPd,
+                        sum: sumPd);
+                    await SQLiteHelper()
+                        .insertValueToSQLite(sqLiteModel)
+                        .then((value) {
+                      amountInt = 1;
+                      Navigator.pop(context);
+                    });
+                  } else {
+                    Navigator.pop(context);
+                    Navigator.pop(context);
+                    MyDialog().normalDialog(context, 'โปรดชำระสินค้า',
+                        'จากร้านเดิมให้เสร็จสิ้นก่อนทำรายการถัดไป ');
+                  }
+                },
                 child: Text(
                   'Add to cart',
                   style: Myconstant().h2BStyle(),

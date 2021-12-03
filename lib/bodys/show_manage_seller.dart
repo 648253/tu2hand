@@ -40,6 +40,15 @@ class _ShowMangeSellerState extends State<ShowMangeSeller> {
     });
   }
 
+ String cutWord(String detailPd) {
+    String result = detailPd;
+    if (result.length >= 25) {
+      result = result.substring(0, 25);
+      result = '$result...';
+    }
+    return result;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -65,7 +74,7 @@ class _ShowMangeSellerState extends State<ShowMangeSeller> {
                       Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: ShowTitle(
-                            title: userModel!.name,
+                            title: cutWord(userModel!.name),
                             textStyle: Myconstant().h1Style()),
                       ),
                     ],

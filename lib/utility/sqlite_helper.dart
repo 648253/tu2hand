@@ -15,10 +15,10 @@ class SQLiteHelper {
   final String columnIdSum = 'sum';
 
   SQLiteHelper() {
-    initialDb();
+    initialDatabase();
   }
 
-  Future<Null> initialDb() async {
+  Future<Null> initialDatabase() async {
     await openDatabase(
       join(await getDatabasesPath(), nameDb),
       onCreate: (db, version) => db.execute(
@@ -27,20 +27,47 @@ class SQLiteHelper {
     );
   }
 
-  Future<Database> connectedDb() async {
+  Future<Database> connectedDatabase() async {
     return await openDatabase(join(await getDatabasesPath(), nameDb));
   }
 
   Future<List<SQLiteModel>> readSQLite() async {
-    Database database = await connectedDb();
+    Database database = await connectedDatabase();
     List<SQLiteModel> results = [];
     List<Map<String, dynamic>> maps = await database.query(tableDb);
-    print('### maps SQLiteHelper ===>>> $maps');
+    // print('### maps on SQLitHelper ==>> $maps');
     for (var item in maps) {
       SQLiteModel model = SQLiteModel.fromMap(item);
       results.add(model);
     }
-
     return results;
   }
+
+  Future<Null> insertValueToSQLite(SQLiteModel sqLiteModel) async {
+    Database database = await connectedDatabase();
+    await database
+        .insert(tableDb, sqLiteModel.toMap())
+        .then((value) => print('### insert Value name ==>> ${sqLiteModel.id}'));
+  }
+
+  Future<void> deleteSQLiteWhereId(int id) async {
+    Database database = await connectedDatabase();
+    await database
+        .delete(tableDb, where: '$columnId = $id')
+        .then((value) => print('### Success Delete id ==> $id'));
+  }
+
+  Future<void> emptySQLite() async {
+    Database database = await connectedDatabase();
+    await database
+        .delete(tableDb)
+        .then((value) => print('### Empty SQLite Success'));
+  }
+
+  Future<Null> clearSQLite() async {
+    await SQLiteHelper().emptySQLite().then((value) {
+      readSQLite();
+    });
+  }
+
 }

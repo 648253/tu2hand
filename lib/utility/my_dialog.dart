@@ -50,8 +50,8 @@ class MyDialog {
       context: context,
       builder: (context) => SimpleDialog(
         title: ListTile(
-          leading: showImage(path: Myconstant.image6),
-          title: ShowTitle(title: title, textStyle: Myconstant().h3Style()),
+          leading: Icon(Icons.check_box_outlined,color: Myconstant.dark),
+          title: ShowTitle(title: title, textStyle: Myconstant().h2Style()),
           subtitle:
               ShowTitle(title: message, textStyle: Myconstant().h3Style()),
         ),
