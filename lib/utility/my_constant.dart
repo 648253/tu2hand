@@ -4,7 +4,7 @@ class Myconstant {
   // General
   static String appName = 'TU2HAND';
   static String domain =
-      'https://7765-2405-9800-bc02-2945-6113-d254-2d9-94fc.ngrok.io';
+      'https://fdd4-2405-9800-bc02-2945-6113-d254-2d9-94fc.ngrok.io';
   static String urlQRcode = 'https://promptpay.io/0612019351.png';
 
   // Route

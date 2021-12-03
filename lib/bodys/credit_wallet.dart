@@ -215,10 +215,14 @@ class _CreditWalletState extends State<CreditWallet> {
 
     await findUser();
 
+
+
     String idBuyer = userModel!.id.toString();
     String nameBuyer = userModel!.name.toString();
     String addressBuyer = userModel!.address.toString();
     String status = 'Wait';
+
+    
 
     print(
         '### dateTime ==> $dateTime , idSeller ==> $idSeller , idPd ==> $idPd , namePd ==> $namePd , pricePd ==> $pricePd , amountPd ==> $amountPd , sumPd ==> $sumPd , idBuyer ==> $idBuyer , nameBuyer ==> $nameBuyer , addressBuyer ==> $addressBuyer, status ==> $status');
