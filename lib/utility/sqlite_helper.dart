@@ -8,6 +8,7 @@ class SQLiteHelper {
   final String tableDb = 'tableOrder';
   final String columnId = 'id';
   final String columnIdSeller = 'idSeller';
+  final String columnIdNameSeller = 'nameSeller';
   final String columnIdPd = 'idPd';
   final String columnIdName = 'name';
   final String columnIdPrice = 'price';
@@ -22,7 +23,7 @@ class SQLiteHelper {
     await openDatabase(
       join(await getDatabasesPath(), nameDb),
       onCreate: (db, version) => db.execute(
-          'CREATE TABLE $tableDb ($columnId INTEGER PRIMARY KEY, $columnIdSeller TEXT, $columnIdPd TEXT, $columnIdName TEXT, $columnIdPrice TEXT, $columnIdAmount TEXT, $columnIdSum TEXT)'),
+          'CREATE TABLE $tableDb ($columnId INTEGER PRIMARY KEY, $columnIdSeller TEXT, $columnIdNameSeller TEXT, $columnIdPd TEXT, $columnIdName TEXT, $columnIdPrice TEXT, $columnIdAmount TEXT, $columnIdSum TEXT)'),
       version: version,
     );
   }
@@ -69,5 +70,4 @@ class SQLiteHelper {
       readSQLite();
     });
   }
-
 }

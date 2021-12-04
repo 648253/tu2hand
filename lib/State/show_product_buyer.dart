@@ -323,16 +323,18 @@ class _ShowProductBuyerState extends State<ShowProductBuyer> {
                 onPressed: () async {
                   String idSeller = userModel!.id;
                   String idPd = productModel.id;
+                  String nameSeller = userModel!.name;
                   String namePd = productModel.namePd;
                   String pricePd = productModel.pricePd;
                   String amountPd = amountInt.toString();
                   String sumPd = (int.parse(pricePd) * amountInt).toString();
-                  
+
                   if ((currentIdSeller == idSeller) ||
                       (currentIdSeller == null)) {
                     SQLiteModel sqLiteModel = SQLiteModel(
                         idSeller: idSeller,
                         idPd: idPd,
+                        nameSeller: nameSeller,
                         name: namePd,
                         price: pricePd,
                         amount: amountPd,

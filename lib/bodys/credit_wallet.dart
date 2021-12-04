@@ -193,6 +193,7 @@ class _CreditWalletState extends State<CreditWallet> {
 
     String dateTime = DateFormat('yyyy-MM-dd HH:mm').format(dateTimeOrder);
     String idSeller = sqliteModels[0].idSeller;
+    String nameShop = sqliteModels[0].nameSeller;
 
     List<String> idPds = [];
     List<String> namePds = [];
@@ -215,20 +216,17 @@ class _CreditWalletState extends State<CreditWallet> {
 
     await findUser();
 
-
-
     String idBuyer = userModel!.id.toString();
     String nameBuyer = userModel!.name.toString();
     String addressBuyer = userModel!.address.toString();
-    String status = 'Wait';
-
-    
+    String phoneBuyer = userModel!.phone.toString();
+    String status = 'preparing';
 
     print(
-        '### dateTime ==> $dateTime , idSeller ==> $idSeller , idPd ==> $idPd , namePd ==> $namePd , pricePd ==> $pricePd , amountPd ==> $amountPd , sumPd ==> $sumPd , idBuyer ==> $idBuyer , nameBuyer ==> $nameBuyer , addressBuyer ==> $addressBuyer, status ==> $status');
+        '### dateTime ==> $dateTime , idSeller ==> $idSeller , idPd ==> $idPd, nameShop ==> $nameShop , namePd ==> $namePd , pricePd ==> $pricePd , amountPd ==> $amountPd , sumPd ==> $sumPd , idBuyer ==> $idBuyer , nameBuyer ==> $nameBuyer , addressBuyer ==> $addressBuyer, phoneBuyer ==> $phoneBuyer, status ==> $status');
 
     String Url =
-        '${Myconstant.domain}/tu2hand/insertOrderBuyer.php?isAdd=true&idSeller=$idSeller&idPd=$idPd&namePd=$namePd&pricePd=$pricePd&amountPd=$amountPd&sumPd=$sumPd&idBuyer=$idBuyer&nameBuyer=$nameBuyer&addressBuyer=$addressBuyer&dateTime=$dateTime&status=$status';
+        '${Myconstant.domain}/tu2hand/insertOrderBuyer.php?isAdd=true&idSeller=$idSeller&idPd=$idPd&nameShop=$nameShop&namePd=$namePd&pricePd=$pricePd&amountPd=$amountPd&sumPd=$sumPd&idBuyer=$idBuyer&nameBuyer=$nameBuyer&addressBuyer=$addressBuyer&phoneBuyer=$phoneBuyer&dateTime=$dateTime&status=$status';
 
     await Dio().get(Url).then((value) {
       if (value.toString() == 'true') {

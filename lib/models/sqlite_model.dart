@@ -4,6 +4,7 @@ class SQLiteModel {
   int? id;
   final String idSeller;
   final String idPd;
+  final String nameSeller;
   final String name;
   final String price;
   final String amount;
@@ -12,6 +13,7 @@ class SQLiteModel {
     this.id,
     required this.idSeller,
     required this.idPd,
+    required this.nameSeller,
     required this.name,
     required this.price,
     required this.amount,
@@ -19,11 +21,11 @@ class SQLiteModel {
   });
 
 
-
   SQLiteModel copyWith({
     int? id,
     String? idSeller,
     String? idPd,
+    String? nameSeller,
     String? name,
     String? price,
     String? amount,
@@ -33,6 +35,7 @@ class SQLiteModel {
       id: id ?? this.id,
       idSeller: idSeller ?? this.idSeller,
       idPd: idPd ?? this.idPd,
+      nameSeller: nameSeller ?? this.nameSeller,
       name: name ?? this.name,
       price: price ?? this.price,
       amount: amount ?? this.amount,
@@ -45,6 +48,7 @@ class SQLiteModel {
       'id': id,
       'idSeller': idSeller,
       'idPd': idPd,
+      'nameSeller': nameSeller,
       'name': name,
       'price': price,
       'amount': amount,
@@ -54,9 +58,10 @@ class SQLiteModel {
 
   factory SQLiteModel.fromMap(Map<String, dynamic> map) {
     return SQLiteModel(
-      id: map['id'],
+      id: map['id'] != null ? map['id'] : null,
       idSeller: map['idSeller'],
       idPd: map['idPd'],
+      nameSeller: map['nameSeller'],
       name: map['name'],
       price: map['price'],
       amount: map['amount'],
@@ -70,7 +75,7 @@ class SQLiteModel {
 
   @override
   String toString() {
-    return 'SQLiteModel(id: $id, idSeller: $idSeller, idPd: $idPd, name: $name, price: $price, amount: $amount, sum: $sum)';
+    return 'SQLiteModel(id: $id, idSeller: $idSeller, idPd: $idPd, nameSeller: $nameSeller, name: $name, price: $price, amount: $amount, sum: $sum)';
   }
 
   @override
@@ -81,6 +86,7 @@ class SQLiteModel {
       other.id == id &&
       other.idSeller == idSeller &&
       other.idPd == idPd &&
+      other.nameSeller == nameSeller &&
       other.name == name &&
       other.price == price &&
       other.amount == amount &&
@@ -92,6 +98,7 @@ class SQLiteModel {
     return id.hashCode ^
       idSeller.hashCode ^
       idPd.hashCode ^
+      nameSeller.hashCode ^
       name.hashCode ^
       price.hashCode ^
       amount.hashCode ^

@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:myfirstpro/widgets/show_title.dart';
 
 class Myconstant {
   // General
   static String appName = 'TU2HAND';
   static String domain =
-      'https://fdd4-2405-9800-bc02-2945-6113-d254-2d9-94fc.ngrok.io';
+      'https://e590-2405-9800-bc02-2945-7885-2164-5214-a336.ngrok.io';
   static String urlQRcode = 'https://promptpay.io/0612019351.png';
+
+  String keyId = 'id';
+  String keyType = 'type';
+  String keyName = 'name';
 
   // Route
   static String routeAuthen = '/authen';
@@ -63,6 +68,12 @@ class Myconstant {
         fontWeight: FontWeight.w700,
       );
 
+  TextStyle h2BlStyle() => TextStyle(
+        fontSize: 18,
+        color: Colors.black,
+        fontWeight: FontWeight.w500,
+      );
+
   TextStyle h2WStyle() => TextStyle(
         fontSize: 18,
         color: Colors.white,
@@ -86,10 +97,16 @@ class Myconstant {
         fontWeight: FontWeight.normal,
       );
 
+  TextStyle h3BStyle() => TextStyle(
+        fontSize: 14,
+        color: Colors.blue,
+        fontWeight: FontWeight.bold,
+      );
+
   TextStyle h3WStyle() => TextStyle(
         fontSize: 14,
         color: Colors.white,
-        fontWeight: FontWeight.normal,
+        fontWeight: FontWeight.bold,
       );
 
   ButtonStyle myButtonStyle() => ElevatedButton.styleFrom(
@@ -98,4 +115,57 @@ class Myconstant {
           borderRadius: BorderRadius.circular(30),
         ),
       );
+
+  List<String> changeToArrays(String string) {
+    List<String> list = [];
+    String str = string.substring(1, string.length - 1);
+    print('my string ==> $str');
+    list = str.split(',');
+    int index = 0;
+    for (var str in list) {
+      list[index] = str.trim();
+      print('my string ==>$str, list[index] ==>${list[index]}');
+      index++;
+    }
+    return list;
+  }
+
+  Container buildHeadOrder() {
+    return Container(
+      padding: EdgeInsets.all(8),
+      decoration: BoxDecoration(color: Colors.red.shade400),
+      child: Row(
+        children: [
+          Expanded(
+            flex: 3,
+            child: ShowTitle(
+              title: 'รายการสินค้า',
+              textStyle: Myconstant().h3WStyle(),
+            ),
+          ),
+          Expanded(
+            flex: 1,
+            child: ShowTitle(
+              title: 'ราคา',
+              textStyle: Myconstant().h3WStyle(),
+            ),
+          ),
+          Expanded(
+            flex: 1,
+            child: ShowTitle(
+              title: 'จำนวน',
+              textStyle: Myconstant().h3WStyle(),
+            ),
+          ),
+          Expanded(
+            flex: 1,
+            child: ShowTitle(
+              title: 'รวม',
+              textStyle: Myconstant().h3WStyle(),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }

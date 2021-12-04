@@ -4,6 +4,7 @@ class OrderModel {
   String id;
   String idSeller;
   String idPd;
+  String nameShop;
   String namePd;
   String pricePd;
   String amountPd;
@@ -11,12 +12,14 @@ class OrderModel {
   String idBuyer;
   String nameBuyer;
   String addressBuyer;
+  String phoneBuyer;
   String dateTime;
   String status;
   OrderModel({
     required this.id,
     required this.idSeller,
     required this.idPd,
+    required this.nameShop,
     required this.namePd,
     required this.pricePd,
     required this.amountPd,
@@ -24,6 +27,7 @@ class OrderModel {
     required this.idBuyer,
     required this.nameBuyer,
     required this.addressBuyer,
+    required this.phoneBuyer,
     required this.dateTime,
     required this.status,
   });
@@ -32,6 +36,7 @@ class OrderModel {
     String? id,
     String? idSeller,
     String? idPd,
+    String? nameShop,
     String? namePd,
     String? pricePd,
     String? amountPd,
@@ -39,6 +44,7 @@ class OrderModel {
     String? idBuyer,
     String? nameBuyer,
     String? addressBuyer,
+    String? phoneBuyer,
     String? dateTime,
     String? status,
   }) {
@@ -46,6 +52,7 @@ class OrderModel {
       id: id ?? this.id,
       idSeller: idSeller ?? this.idSeller,
       idPd: idPd ?? this.idPd,
+      nameShop: nameShop ?? this.nameShop,
       namePd: namePd ?? this.namePd,
       pricePd: pricePd ?? this.pricePd,
       amountPd: amountPd ?? this.amountPd,
@@ -53,6 +60,7 @@ class OrderModel {
       idBuyer: idBuyer ?? this.idBuyer,
       nameBuyer: nameBuyer ?? this.nameBuyer,
       addressBuyer: addressBuyer ?? this.addressBuyer,
+      phoneBuyer: phoneBuyer ?? this.phoneBuyer,
       dateTime: dateTime ?? this.dateTime,
       status: status ?? this.status,
     );
@@ -63,6 +71,7 @@ class OrderModel {
       'id': id,
       'idSeller': idSeller,
       'idPd': idPd,
+      'nameShop': nameShop,
       'namePd': namePd,
       'pricePd': pricePd,
       'amountPd': amountPd,
@@ -70,6 +79,7 @@ class OrderModel {
       'idBuyer': idBuyer,
       'nameBuyer': nameBuyer,
       'addressBuyer': addressBuyer,
+      'phoneBuyer': phoneBuyer,
       'dateTime': dateTime,
       'status': status,
     };
@@ -80,6 +90,7 @@ class OrderModel {
       id: map['id'],
       idSeller: map['idSeller'],
       idPd: map['idPd'],
+      nameShop: map['nameShop'],
       namePd: map['namePd'],
       pricePd: map['pricePd'],
       amountPd: map['amountPd'],
@@ -87,6 +98,7 @@ class OrderModel {
       idBuyer: map['idBuyer'],
       nameBuyer: map['nameBuyer'],
       addressBuyer: map['addressBuyer'],
+      phoneBuyer: map['phoneBuyer'],
       dateTime: map['dateTime'],
       status: map['status'],
     );
@@ -98,7 +110,7 @@ class OrderModel {
 
   @override
   String toString() {
-    return 'OrderModel(id: $id, idSeller: $idSeller, idPd: $idPd, namePd: $namePd, pricePd: $pricePd, amountPd: $amountPd, sumPd: $sumPd, idBuyer: $idBuyer, nameBuyer: $nameBuyer, addressBuyer: $addressBuyer, dateTime: $dateTime, status: $status)';
+    return 'OrderModel(id: $id, idSeller: $idSeller, idPd: $idPd, nameShop: $nameShop, namePd: $namePd, pricePd: $pricePd, amountPd: $amountPd, sumPd: $sumPd, idBuyer: $idBuyer, nameBuyer: $nameBuyer, addressBuyer: $addressBuyer, phoneBuyer: $phoneBuyer, dateTime: $dateTime, status: $status)';
   }
 
   @override
@@ -109,6 +121,7 @@ class OrderModel {
       other.id == id &&
       other.idSeller == idSeller &&
       other.idPd == idPd &&
+      other.nameShop == nameShop &&
       other.namePd == namePd &&
       other.pricePd == pricePd &&
       other.amountPd == amountPd &&
@@ -116,6 +129,7 @@ class OrderModel {
       other.idBuyer == idBuyer &&
       other.nameBuyer == nameBuyer &&
       other.addressBuyer == addressBuyer &&
+      other.phoneBuyer == phoneBuyer &&
       other.dateTime == dateTime &&
       other.status == status;
   }
@@ -125,6 +139,7 @@ class OrderModel {
     return id.hashCode ^
       idSeller.hashCode ^
       idPd.hashCode ^
+      nameShop.hashCode ^
       namePd.hashCode ^
       pricePd.hashCode ^
       amountPd.hashCode ^
@@ -132,6 +147,7 @@ class OrderModel {
       idBuyer.hashCode ^
       nameBuyer.hashCode ^
       addressBuyer.hashCode ^
+      phoneBuyer.hashCode ^
       dateTime.hashCode ^
       status.hashCode;
   }
