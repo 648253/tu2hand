@@ -1,7 +1,12 @@
+import 'dart:convert';
+
+import 'package:badges/badges.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:myfirstpro/bodys/my_order.dart';
 import 'package:myfirstpro/bodys/my_money.dart';
 import 'package:myfirstpro/bodys/show_all_shop_buyer.dart';
+import 'package:myfirstpro/models/cart_model.dart';
 import 'package:myfirstpro/utility/my_constant.dart';
 import 'package:myfirstpro/widgets/show_signout.dart';
 import 'package:myfirstpro/widgets/show_title.dart';
@@ -15,21 +20,43 @@ class BuyerService extends StatefulWidget {
 }
 
 class _BuyerServiceState extends State<BuyerService> {
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    findDetailSeller();
+  }
+
   List<Widget> widgets = [
     ShowAllShopBuyer(),
     MyMoneyBuyer(),
     MyOrderBuyer(),
   ];
+  List<CartModel> cartModels = [];
   int indexWidgets = 0;
+  String? idBuyer;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         actions: [
-          IconButton(
-            onPressed: () => Navigator.pushNamed(context, Myconstant.routeBuyerShowCart),
-            icon: Icon(Icons.shopping_cart_outlined),
+          Padding(
+            padding: const EdgeInsets.all(14),
+            child: Badge(
+              position: BadgePosition.topEnd(),
+              badgeColor: Colors.green,
+              badgeContent: Text('${cartModels.length}',
+                  style: TextStyle(color: Colors.white)),
+              animationDuration: Duration(milliseconds: 300),
+              child: IconButton(
+                onPressed: () {
+                  findDetailSeller();
+                  Navigator.pushNamed(context, Myconstant.routeBuyerShowCart);
+                },
+                icon: Icon(Icons.shopping_cart_outlined),
+              ),
+            ),
           ),
         ],
         title: Text('Buyer'),
@@ -51,6 +78,31 @@ class _BuyerServiceState extends State<BuyerService> {
       ),
       body: widgets[indexWidgets],
     );
+  }
+
+  Future<Null> findDetailSeller() async {
+    if (cartModels.isNotEmpty) {
+      cartModels.clear();
+    }
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    idBuyer = preferences.getString(Myconstant().keyId);
+    String path =
+        '${Myconstant.domain}/tu2hand/getCartWhereIdBuyer.php?isAdd=true&idBuyer=$idBuyer';
+    await Dio().get(path).then((value) {
+      String s = value.data.toString();
+      //print('${s == 'null'}');
+      if (s == 'null') {
+      } else {
+        for (var map in json.decode(value.data)) {
+          CartModel cartModel = CartModel.fromMap(map);
+          //print(cartModel);
+          //  List<String> cartNamePd = cartModel.namePd;
+          setState(() {
+            cartModels.add(cartModel);
+          });
+        }
+      }
+    });
   }
 
   ListTile menuShowAllShop() {

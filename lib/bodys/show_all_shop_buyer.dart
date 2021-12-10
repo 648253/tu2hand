@@ -4,11 +4,13 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:myfirstpro/State/show_product_buyer.dart';
+import 'package:myfirstpro/models/cart_model.dart';
 import 'package:myfirstpro/models/user_model.dart';
 import 'package:myfirstpro/utility/my_constant.dart';
 import 'package:myfirstpro/widgets/show_image.dart';
 import 'package:myfirstpro/widgets/show_progress.dart';
 import 'package:myfirstpro/widgets/show_title.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ShowAllShopBuyer extends StatefulWidget {
   const ShowAllShopBuyer({Key? key}) : super(key: key);
@@ -20,6 +22,8 @@ class ShowAllShopBuyer extends StatefulWidget {
 class _ShowAllShopBuyerState extends State<ShowAllShopBuyer> {
   bool load = true;
   List<UserModel> userModels = [];
+  List<CartModel> cartModels = [];
+  String? idBuyer;
 
   @override
   void initState() {
@@ -58,8 +62,9 @@ class _ShowAllShopBuyerState extends State<ShowAllShopBuyer> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) =>
-                          ShowProductBuyer(userModel: userModels[index]),
+                      builder: (context) {
+                        return ShowProductBuyer(userModel: userModels[index]);
+                      },
                     ),
                   );
                   print('Click from ${userModels[index].name}');

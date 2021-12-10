@@ -1,11 +1,12 @@
 import 'dart:convert';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:myfirstpro/models/sqlite_model.dart';
-import 'package:myfirstpro/models/user_model.dart';
+import 'package:intl/intl.dart';
+import 'package:myfirstpro/models/cart_model.dart';
+import 'package:myfirstpro/models/order_model.dart';
 import 'package:myfirstpro/utility/my_constant.dart';
-import 'package:myfirstpro/utility/sqlite_helper.dart';
 import 'package:myfirstpro/widgets/show_image.dart';
 import 'package:myfirstpro/widgets/show_progress.dart';
 import 'package:myfirstpro/widgets/show_title.dart';
@@ -19,38 +20,225 @@ class ShowCartBuyer extends StatefulWidget {
 }
 
 class _ShowCartBuyerState extends State<ShowCartBuyer> {
-  List<SQLiteModel> sqliteModels = [];
-  bool load = true;
-  UserModel? userModel;
+  String? idBuyer;
+  List<CartModel> cartModels = [];
+  List<String> listCartNameSellers = [];
+  List<String> listCartNames = [];
+  List<String> listCartPrices = [];
+  List<String> listCartAmounts = [];
+  List<String> listCartSums = [];
+  List<String> listCartImgs = [];
   int? total;
+  bool load = true;
 
+//=======================================================
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    processReadSQLite();
+    findDetailSeller();
   }
 
-  Future<Null> processReadSQLite() async {
-    if (sqliteModels.isNotEmpty) {
-      sqliteModels.clear();
-    }
+//=======================================================
 
-    await SQLiteHelper().readSQLite().then((value) {
-      //print('### valueOnProcessReadSQLite ==> $value');
-      setState(() {
-        load = false;
-        sqliteModels = value;
-        findDetailSeller();
-        calTotal();
-      });
-    });
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('ตะกร้าของฉัน'),
+      ),
+      body: load
+          ? ShowProgress()
+          : cartModels.isEmpty
+              ? showHaveNoOrder()
+              : SingleChildScrollView(child: buildContent()),
+    );
+  }
+
+  Center showHaveNoOrder() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            margin: EdgeInsets.symmetric(vertical: 16),
+            width: 200,
+            child: showImage(path: Myconstant.image6),
+          ),
+          ShowTitle(title: 'ว่างเปล่า!', textStyle: Myconstant().h1Style()),
+        ],
+      ),
+    );
+  }
+
+//=======================================================
+
+  Widget buildContent() {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Myconstant().buildEmptyBlock(),
+          Myconstant().buildHeadOrder(),
+          Myconstant().buildEmptyBlock(),
+          listProduct(),
+          Myconstant().buildEmptyBlock(),
+          Divider(
+            thickness: 1,
+            color: Colors.black,
+          ),
+          Myconstant().buildEmptyBlock(),
+          Card(
+            child: Row(
+              children: [
+                SizedBox(
+                  width: 10,
+                ),
+                ShowTitle(
+                  textStyle: Myconstant().h2BlStyle(),
+                  title: 'Total :  ',
+                ),
+                SizedBox(
+                  width: 10,
+                ),
+                ShowTitle(
+                  title: '฿${Myconstant().moneyFormat((total.toString()))}',
+                  textStyle: Myconstant().h1Style(),
+                ),
+                SizedBox(
+                  width: 30,
+                ),
+                buttonController(),
+              ],
+            ),
+          ),
+          Myconstant().buildEmptyBlock(),
+          Divider(
+            thickness: 1,
+            color: Colors.black,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Row buttonController() {
+    return Row(
+      children: [
+        ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            primary: Colors.lightGreen,
+          ),
+          onPressed: () {
+            //Navigator.pushNamed(context, Myconstant.routeAddWallet);
+          },
+          child: Text('Order'),
+        ),
+        Container(
+            margin: EdgeInsets.symmetric(
+              horizontal: 16,
+            ),
+            child: ElevatedButton(
+              onPressed: () => confirmEmptyCart(),
+              child: Text('Clear'),
+            )),
+      ],
+    );
+  }
+
+  ListView listProduct() {
+    return ListView.builder(
+      shrinkWrap: true,
+      physics: ScrollPhysics(),
+      itemCount: cartModels.length,
+      itemBuilder: (context, index) => Padding(
+        padding: const EdgeInsets.all(8),
+        child: Column(
+          children: [
+            Card(
+              child: Row(
+                children: [
+                  Expanded(
+                    flex: 3,
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 80,
+                          height: 80,
+                          child: CachedNetworkImage(fit: BoxFit.cover,
+                            imageUrl:
+                                '${Myconstant.domain}${cartModels[index].imgPd}',
+                            placeholder: (context, url) => ShowProgress(),
+                          ),
+                        ),
+                        Container(
+                          margin: EdgeInsets.only(left: 48),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.only(bottom: 5),
+                                child: ShowTitle(
+                                    title:
+                                        'ร้าน :  ${cartModels[index].nameSeller}'),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.only(bottom: 5),
+                                child: ShowTitle(
+                                    title:
+                                        'สินค้า : ${cartModels[index].namePd}'),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.only(bottom: 5),
+                                child: ShowTitle(
+                                    textStyle: Myconstant().h2BlStyle(),
+                                    title:
+                                        '฿${Myconstant().moneyFormat(cartModels[index].pricePd)}'),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.only(bottom: 5),
+                                child: ShowTitle(
+                                    title:
+                                        'จำนวน : x${cartModels[index].amountPd}'),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: () async {
+                      SharedPreferences preferences =
+                          await SharedPreferences.getInstance();
+                      idBuyer = preferences.getString(Myconstant().keyId);
+                      String id = cartModels[index].id;
+                      String path =
+                          '${Myconstant.domain}/tu2hand/deleteOrderWhereId.php?isAdd=true&id=$id&idBuyer=$idBuyer';
+                      Dio().get(path).then((value) {
+                        findDetailSeller();
+                      });
+                      print('### Delete id ===> $id');
+                    },
+                    icon: Icon(
+                      Icons.delete_forever_outlined,
+                      color: Colors.red.shade900,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   void calTotal() async {
     total = 0;
-    for (var item in sqliteModels) {
-      int sumInt = int.parse(item.sum.trim());
+    for (var item in cartModels) {
+      int sumInt = int.parse(item.sumPd);
       setState(() {
         total = total! + sumInt;
       });
@@ -58,62 +246,39 @@ class _ShowCartBuyerState extends State<ShowCartBuyer> {
   }
 
   Future<Null> findDetailSeller() async {
-    if (sqliteModels.isNotEmpty) {
-      String idSeller = sqliteModels[0].idSeller;
-
-      //print('### idSeller ==> $idSeller');
-      String apiGetUserWhereId =
-          '${Myconstant.domain}/tu2hand/getUserWhereId.php?isAdd=true&id=$idSeller';
-      await Dio().get(apiGetUserWhereId).then((value) {
-        for (var item in json.decode(value.data)) {
+    if (cartModels.isNotEmpty) {
+      cartModels.clear();
+    }
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    idBuyer = preferences.getString(Myconstant().keyId);
+    String path =
+        '${Myconstant.domain}/tu2hand/getCartWhereIdBuyer.php?isAdd=true&idBuyer=$idBuyer';
+    await Dio().get(path).then((value) {
+      String s = value.data.toString();
+      //print('${s == 'null'}');
+      if (s == 'null') {
+        setState(() {
+          load = false;
+        });
+      } else {
+        for (var map in json.decode(value.data)) {
+          CartModel cartModel = CartModel.fromMap(map);
+          //print(cartModel);
+          //  List<String> cartNamePd = cartModel.namePd;
           setState(() {
-            userModel = UserModel.fromMap(item);
+            load = false;
+            cartModels.add(cartModel);
+            listCartNameSellers.add(cartModel.nameSeller);
+            listCartNames.add(cartModel.namePd);
+            listCartPrices.add(cartModel.pricePd);
+            listCartAmounts.add(cartModel.amountPd);
+            listCartSums.add(cartModel.sumPd);
+            listCartImgs.add(cartModel.imgPd);
+            calTotal();
           });
         }
-      });
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Show Cart'),
-      ),
-      body: load
-          ? ShowProgress()
-          : sqliteModels.isEmpty
-              ? Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Container(
-                        margin: EdgeInsets.symmetric(vertical: 16),
-                        width: 200,
-                        child: showImage(path: Myconstant.image6),
-                      ),
-                      ShowTitle(
-                          title: 'Empty!', textStyle: Myconstant().h1Style()),
-                    ],
-                  ),
-                )
-              : buildContent(),
-    );
-  }
-
-  Column buildContent() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        showSellerCart(),
-        builldHead(),
-        listProduct(),
-        buildDivider(),
-        buildTotal(),
-        buildDivider(),
-        buttonController(),
-      ],
-    );
+      }
+    });
   }
 
   Future<Null> confirmEmptyCart() async {
@@ -134,9 +299,11 @@ class _ShowCartBuyerState extends State<ShowCartBuyer> {
         actions: [
           TextButton(
             onPressed: () async {
-              await SQLiteHelper().clearSQLite().then((value) {
+              String path =
+                  '${Myconstant.domain}/tu2hand/deleteAllCartWhereIdBuyer.php?isAdd=true&idBuyer=$idBuyer';
+              await Dio().get(path).then((value) {
+                findDetailSeller();
                 Navigator.pop(context);
-                processReadSQLite();
               });
             },
             child: Text('Confirm'),
@@ -148,194 +315,5 @@ class _ShowCartBuyerState extends State<ShowCartBuyer> {
         ],
       ),
     );
-  }
-
-  Row buttonController() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.end,
-      children: [
-        ElevatedButton(
-          onPressed: () {
-            Navigator.pushNamed(context, Myconstant.routeAddWallet);
-          },
-          child: Text('Order'),
-        ),
-        Container(
-            margin: EdgeInsets.symmetric(
-              horizontal: 16,
-            ),
-            child: ElevatedButton(
-              onPressed: () => confirmEmptyCart(),
-              child: Text('Clear'),
-            )),
-      ],
-    );
-  }
-
-  Row buildTotal() {
-    return Row(
-      children: [
-        Expanded(
-          flex: 4,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              ShowTitle(
-                title: 'Total :',
-                textStyle: Myconstant().h2Style(),
-              ),
-            ],
-          ),
-        ),
-        Expanded(
-          flex: 2,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              ShowTitle(
-                title: total == null ? '' : total.toString(),
-                textStyle: Myconstant().h1Style(),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Divider buildDivider() {
-    return Divider(
-      color: Myconstant.dark,
-      thickness: 1,
-    );
-  }
-
-  ListView listProduct() {
-    return ListView.builder(
-      shrinkWrap: true,
-      physics: ScrollPhysics(),
-      itemCount: sqliteModels.length,
-      itemBuilder: (context, index) => Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8),
-        child: Row(
-          children: [
-            Expanded(
-              flex: 3,
-              child: ShowTitle(
-                title: sqliteModels[index].name,
-                textStyle: Myconstant().h3Style(),
-              ),
-            ),
-            Expanded(
-              flex: 1,
-              child: ShowTitle(
-                title: sqliteModels[index].price,
-                textStyle: Myconstant().h3Style(),
-              ),
-            ),
-            Expanded(
-              flex: 1,
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: ShowTitle(
-                  title: sqliteModels[index].amount,
-                  textStyle: Myconstant().h3Style(),
-                ),
-              ),
-            ),
-            Expanded(
-              flex: 1,
-              child: ShowTitle(
-                title: sqliteModels[index].sum,
-                textStyle: Myconstant().h3Style(),
-              ),
-            ),
-            Expanded(
-              flex: 1,
-              child: IconButton(
-                onPressed: () async {
-                  int idSQLite = sqliteModels[index].id!;
-                  print('### Delete idSQLite ===> $idSQLite');
-                  SQLiteHelper()
-                      .deleteSQLiteWhereId(idSQLite)
-                      .then((value) => processReadSQLite());
-                },
-                icon: Icon(
-                  Icons.delete_forever_outlined,
-                  color: Colors.red.shade900,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Container builldHead() {
-    return Container(
-      decoration: BoxDecoration(color: Myconstant.light),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 10),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8),
-          child: Row(
-            children: [
-              Expanded(
-                flex: 3,
-                child: ShowTitle(
-                  title: 'Product',
-                  textStyle: Myconstant().h2Style(),
-                ),
-              ),
-              Expanded(
-                flex: 1,
-                child: ShowTitle(
-                  title: 'Price',
-                  textStyle: Myconstant().h2Style(),
-                ),
-              ),
-              Expanded(
-                flex: 1,
-                child: ShowTitle(
-                  title: 'Vol.',
-                  textStyle: Myconstant().h2Style(),
-                ),
-              ),
-              Expanded(
-                flex: 1,
-                child: ShowTitle(
-                  title: 'Sum',
-                  textStyle: Myconstant().h2Style(),
-                ),
-              ),
-              Expanded(
-                flex: 1,
-                child: SizedBox(),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Padding showSellerCart() {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: ShowTitle(
-        title: userModel == null ? '' : cutWord(userModel!.name),
-        textStyle: Myconstant().h1Style(),
-      ),
-    );
-  }
-
-  String cutWord(String string) {
-    String result = string;
-    if (result.length >= 30) {
-      result = result.substring(0, 30);
-      result = '$result ...';
-    }
-    return result;
   }
 }

@@ -4,6 +4,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:myfirstpro/models/cart_model.dart';
 import 'package:myfirstpro/models/product_model.dart';
 import 'package:myfirstpro/models/sqlite_model.dart';
 import 'package:myfirstpro/models/user_model.dart';
@@ -13,6 +14,7 @@ import 'package:myfirstpro/utility/sqlite_helper.dart';
 import 'package:myfirstpro/widgets/show_image.dart';
 import 'package:myfirstpro/widgets/show_progress.dart';
 import 'package:myfirstpro/widgets/show_title.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ShowProductBuyer extends StatefulWidget {
   final UserModel userModel;
@@ -24,13 +26,17 @@ class ShowProductBuyer extends StatefulWidget {
 
 class _ShowProductBuyerState extends State<ShowProductBuyer> {
   UserModel? userModel;
+  String? idBuyer;
   bool load = true;
   bool? havePd;
+  List<CartModel> cartModels = [];
   List<ProductModel> productModels = [];
   List<List<String>> listImage = [];
+  List<SQLiteModel> models = [];
   int indexImage = 0;
   int amountInt = 1;
   String? currentIdSeller;
+  int k = 0;
 
   @override
   void initState() {
@@ -42,14 +48,11 @@ class _ShowProductBuyerState extends State<ShowProductBuyer> {
 
   Future<Null> readCart() async {
     await SQLiteHelper().readSQLite().then((value) {
-      print('### value readCart == $value');
+      //print('### value readCart == $value');
       if (value.length != 0) {
-        List<SQLiteModel> models = [];
         for (var model in value) {
           models.add(model);
         }
-        currentIdSeller = models[0].idSeller;
-        print('### currentIdSeller = $currentIdSeller');
       }
     });
   }
@@ -187,6 +190,19 @@ class _ShowProductBuyerState extends State<ShowProductBuyer> {
     return result;
   }
 
+  String sendUrlImage(String arrayImage) {
+    String string = arrayImage.substring(1, arrayImage.length - 1);
+    List<String> strs = string.split(',');
+    int index = 0;
+    for (var item in strs) {
+      strs[index] = item.trim();
+      index++;
+    }
+    String result = '/tu2hand${strs[0]}';
+    //print('######## result ===> $result');
+    return result;
+  }
+
   Future<Null> showAlertDialog(
       ProductModel productModel, List<String> images) async {
     showDialog(
@@ -201,14 +217,17 @@ class _ShowProductBuyerState extends State<ShowProductBuyer> {
       ProductModel productModel, List<String> images, StateSetter setState) {
     return AlertDialog(
       title: ListTile(
-        leading: showImage(path: Myconstant.image1),
+        trailing: showImage(path: Myconstant.image1),
         title: ShowTitle(
           title: productModel.namePd,
           textStyle: Myconstant().h2Style(),
         ),
-        subtitle: ShowTitle(
-          title: 'Price = ${productModel.pricePd} THB',
-          textStyle: Myconstant().h3Style(),
+        subtitle: Padding(
+          padding: const EdgeInsets.only(top: 8),
+          child: ShowTitle(
+            title: '฿ ${Myconstant().moneyFormat(productModel.pricePd)}',
+            textStyle: Myconstant().h2Style(),
+          ),
         ),
       ),
       content: SingleChildScrollView(
@@ -328,29 +347,53 @@ class _ShowProductBuyerState extends State<ShowProductBuyer> {
                   String pricePd = productModel.pricePd;
                   String amountPd = amountInt.toString();
                   String sumPd = (int.parse(pricePd) * amountInt).toString();
+                  String? amountEdit;
+                  String? sumPdEdit;
+                  String imgPd = sendUrlImage(productModel.imagesPd);
 
-                  if ((currentIdSeller == idSeller) ||
-                      (currentIdSeller == null)) {
-                    SQLiteModel sqLiteModel = SQLiteModel(
-                        idSeller: idSeller,
-                        idPd: idPd,
-                        nameSeller: nameSeller,
-                        name: namePd,
-                        price: pricePd,
-                        amount: amountPd,
-                        sum: sumPd);
-                    await SQLiteHelper()
-                        .insertValueToSQLite(sqLiteModel)
-                        .then((value) {
-                      amountInt = 1;
+                  // print(
+                  //     'idSeller ==> $idSeller , idPd ==> $idPd, nameShop ==> $nameSeller , namePd ==> $namePd , pricePd ==> $pricePd , amountPd ==> $amountPd , sumPd ==> $sumPd');
+//get=================================================================================================
+                  SharedPreferences preferences =
+                      await SharedPreferences.getInstance();
+                  idBuyer = preferences.getString('id')!;
+                  print('########## $idBuyer');
+                  try {
+                    String path =
+                        '${Myconstant.domain}/tu2hand/getCartWhereIdBuyerNIdPd.php?isAdd=true&idBuyer=$idBuyer&idPd=$idPd';
+                    await Dio().get(path).then((value) {
+                      for (var item in json.decode(value.data)) {
+                        CartModel cartModel = CartModel.fromMap(item);
+                        amountEdit = (int.parse(cartModel.amountPd) + amountInt)
+                            .toString();
+                        sumPdEdit =
+                            (int.parse(pricePd) * int.parse(amountEdit!))
+                                .toString();
+                        print('### myGetModel is ==> ${cartModel.namePd}');
+                      }
+                    });
+
+                    String way =
+                        '${Myconstant.domain}/tu2hand/editAmountPdWhereIdBuyerNIdPd.php?isAdd=true&idBuyer=$idBuyer&idPd=$idPd&amountPd=$amountEdit&sumPd=$sumPdEdit';
+                    await Dio().get(way).then((value) {
                       Navigator.pop(context);
                     });
-                  } else {
-                    Navigator.pop(context);
-                    Navigator.pop(context);
-                    MyDialog().normalDialog(context, 'โปรดชำระสินค้า',
-                        'จากร้านเดิมให้เสร็จสิ้นก่อนทำรายการถัดไป ');
+                    print(
+                        ' #### Update ##### idSeller ==> $idSeller , idPd ==> $idPd, nameShop ==> $nameSeller , namePd ==> $namePd , pricePd ==> $pricePd , amountPd ==> $amountEdit , sumPd ==> $sumPdEdit');
+
+//edit=================================================================================================
+
+                  } catch (e) {
+                    String Url =
+                        '${Myconstant.domain}/tu2hand/insertCartBuyer.php?isAdd=true&idBuyer=$idBuyer&idSeller=$idSeller&idPd=$idPd&nameSeller=$nameSeller&namePd=$namePd&pricePd=$pricePd&amountPd=$amountPd&sumPd=$sumPd&imgPd=$imgPd';
+
+                    await Dio().get(Url).then((value) {
+                      print('### value ==> $e');
+                      Navigator.pop(context);
+                    });
                   }
+
+//insert=================================================================================================
                 },
                 child: Text(
                   'Add to cart',

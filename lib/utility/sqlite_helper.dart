@@ -15,6 +15,8 @@ class SQLiteHelper {
   final String columnIdAmount = 'amount';
   final String columnIdSum = 'sum';
 
+  var phone;
+
   SQLiteHelper() {
     initialDatabase();
   }
@@ -41,14 +43,25 @@ class SQLiteHelper {
       SQLiteModel model = SQLiteModel.fromMap(item);
       results.add(model);
     }
+    //print('#### $results');
     return results;
   }
 
   Future<Null> insertValueToSQLite(SQLiteModel sqLiteModel) async {
     Database database = await connectedDatabase();
-    await database
-        .insert(tableDb, sqLiteModel.toMap())
-        .then((value) => print('### insert Value name ==>> ${sqLiteModel.id}'));
+
+    await database.insert(tableDb, sqLiteModel.toMap());
+
+    //print('${sqLiteModel}');
+  }
+
+  Future<Null> updateValueToSQLite(
+      SQLiteModel sqLiteModel, String sumPd, String amountPd, String id) async {
+    Database database = await connectedDatabase();
+
+    await database.rawUpdate(
+        "UPDATE `tableOrder` SET `sum` = '$sumPd' , `amount` = '$amountPd' WHERE idPd = '$id'");
+    readSQLite();
   }
 
   Future<void> deleteSQLiteWhereId(int id) async {

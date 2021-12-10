@@ -57,6 +57,7 @@ class MyApp extends StatelessWidget {
     MaterialColor materialColor =
         MaterialColor(0xffb61825, Myconstant.mapMaterialColor);
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: Myconstant.appName,
       routes: map,
       initialRoute: initialRoute,

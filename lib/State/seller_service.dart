@@ -56,7 +56,7 @@ class _SellerServiceState extends State<SellerService> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Myconstant.dark,
-        title: Text('Seller'),
+        title: userModel == null ? ShowProgress() : Text('${userModel!.name}'),
       ),
       drawer: widgets.length == 0
           ? SizedBox()

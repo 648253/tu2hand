@@ -225,7 +225,7 @@ class _MyOrderBuyerState extends State<MyOrderBuyer> {
 
         //print('### total ==> $total');
 
-        //print('my string ==> $orderPd');
+        print('my string/// ==> $orderPd');
         setState(() {
           statusOrder = false;
           orderModels.add(orderModel);

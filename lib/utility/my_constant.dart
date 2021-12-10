@@ -5,7 +5,7 @@ class Myconstant {
   // General
   static String appName = 'TU2HAND';
   static String domain =
-      'https://e590-2405-9800-bc02-2945-7885-2164-5214-a336.ngrok.io';
+      'https://55d8-2405-9800-bc02-2945-3512-2b60-8799-d900.ngrok.io';
   static String urlQRcode = 'https://promptpay.io/0612019351.png';
 
   String keyId = 'id';
@@ -71,7 +71,7 @@ class Myconstant {
   TextStyle h2BlStyle() => TextStyle(
         fontSize: 18,
         color: Colors.black,
-        fontWeight: FontWeight.w500,
+        fontWeight: FontWeight.bold,
       );
 
   TextStyle h2WStyle() => TextStyle(
@@ -130,42 +130,37 @@ class Myconstant {
     return list;
   }
 
-  Container buildHeadOrder() {
+  Widget buildHeadOrder() {
     return Container(
       padding: EdgeInsets.all(8),
       decoration: BoxDecoration(color: Colors.red.shade400),
       child: Row(
         children: [
           Expanded(
-            flex: 3,
+            flex: 2,
             child: ShowTitle(
               title: 'รายการสินค้า',
-              textStyle: Myconstant().h3WStyle(),
-            ),
-          ),
-          Expanded(
-            flex: 1,
-            child: ShowTitle(
-              title: 'ราคา',
-              textStyle: Myconstant().h3WStyle(),
-            ),
-          ),
-          Expanded(
-            flex: 1,
-            child: ShowTitle(
-              title: 'จำนวน',
-              textStyle: Myconstant().h3WStyle(),
-            ),
-          ),
-          Expanded(
-            flex: 1,
-            child: ShowTitle(
-              title: 'รวม',
               textStyle: Myconstant().h3WStyle(),
             ),
           ),
         ],
       ),
     );
+  }
+
+  SizedBox buildEmptyBlock() {
+    return SizedBox(
+      width: 12,
+      height: 10,
+    );
+  }
+
+  String moneyFormat(String price) {
+    String value = price;
+    if (price.length > 2) {
+      value = value.replaceAll(RegExp(r'\D'), '');
+      value = value.replaceAll(RegExp(r'\B(?=(\d{3})+(?!\d))'), ',');
+    }
+    return value;
   }
 }

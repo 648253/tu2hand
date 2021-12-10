@@ -41,7 +41,8 @@ class _ShowOrderSellerState extends State<ShowOrderSeller> {
       //print('### value ==> $value');
       for (var map in json.decode(value.data)) {
         OrderModel orderModel = OrderModel.fromMap(map);
-        //print('### orderModel ==> ${model}');
+      
+        //print('### orderModel ==> ${orderModel}');
 
         List<String> orderPd = Myconstant().changeToArrays(orderModel.namePd);
         List<String> orderPrice =

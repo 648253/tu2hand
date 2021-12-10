@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:crypt/crypt.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:myfirstpro/models/user_model.dart';
@@ -8,6 +9,7 @@ import 'package:myfirstpro/utility/my_dialog.dart';
 import 'package:myfirstpro/widgets/show_image.dart';
 import 'package:myfirstpro/widgets/show_title.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:crypto/crypto.dart';
 
 class Authen extends StatefulWidget {
   const Authen({Key? key}) : super(key: key);
@@ -77,6 +79,8 @@ class _AuthenState extends State<Authen> {
                 if (formKey.currentState!.validate()) {
                   String user = userController.text;
                   String password = passwordController.text;
+
+
                   print('## user =$user, ## password = $password');
                   checkAuthen(user: user, password: password);
                 } else {}
