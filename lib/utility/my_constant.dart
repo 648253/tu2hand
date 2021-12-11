@@ -5,7 +5,7 @@ class Myconstant {
   // General
   static String appName = 'TU2HAND';
   static String domain =
-      'https://55d8-2405-9800-bc02-2945-3512-2b60-8799-d900.ngrok.io';
+      'https://67cb-2405-9800-bc02-2945-b83c-e17f-4590-a303.ngrok.io';
   static String urlQRcode = 'https://promptpay.io/0612019351.png';
 
   String keyId = 'id';
@@ -88,6 +88,16 @@ class Myconstant {
   TextStyle h2BStyle() => TextStyle(
         fontSize: 18,
         color: Colors.blue.shade800,
+        fontWeight: FontWeight.w700,
+      );
+  TextStyle h2BlaStyle() => TextStyle(
+        fontSize: 18,
+        color: Colors.black38,
+        fontWeight: FontWeight.bold,
+      );
+  TextStyle h2GStyle() => TextStyle(
+        fontSize: 18,
+        color: Colors.green,
         fontWeight: FontWeight.w700,
       );
 

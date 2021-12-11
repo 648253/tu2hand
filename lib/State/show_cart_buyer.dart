@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:myfirstpro/models/cart_model.dart';
 import 'package:myfirstpro/models/order_model.dart';
+import 'package:myfirstpro/models/user_model.dart';
 import 'package:myfirstpro/utility/my_constant.dart';
 import 'package:myfirstpro/widgets/show_image.dart';
 import 'package:myfirstpro/widgets/show_progress.dart';
@@ -21,6 +22,7 @@ class ShowCartBuyer extends StatefulWidget {
 
 class _ShowCartBuyerState extends State<ShowCartBuyer> {
   String? idBuyer;
+  UserModel? userModel;
   List<CartModel> cartModels = [];
   List<String> listCartNameSellers = [];
   List<String> listCartNames = [];
@@ -36,6 +38,7 @@ class _ShowCartBuyerState extends State<ShowCartBuyer> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    findUser();
     findDetailSeller();
   }
 
@@ -131,6 +134,8 @@ class _ShowCartBuyerState extends State<ShowCartBuyer> {
             primary: Colors.lightGreen,
           ),
           onPressed: () {
+            sendCartToOrder();
+
             //Navigator.pushNamed(context, Myconstant.routeAddWallet);
           },
           child: Text('Order'),
@@ -166,7 +171,8 @@ class _ShowCartBuyerState extends State<ShowCartBuyer> {
                         Container(
                           width: 80,
                           height: 80,
-                          child: CachedNetworkImage(fit: BoxFit.cover,
+                          child: CachedNetworkImage(
+                            fit: BoxFit.cover,
                             imageUrl:
                                 '${Myconstant.domain}${cartModels[index].imgPd}',
                             placeholder: (context, url) => ShowProgress(),
@@ -315,5 +321,36 @@ class _ShowCartBuyerState extends State<ShowCartBuyer> {
         ],
       ),
     );
+  }
+
+  Future<void> findUser() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    String user = preferences.getString('user')!;
+    String apiGetUser =
+        '${Myconstant.domain}/tu2hand/getUserWhereUser.php?isAdd=true&user=$user';
+    await Dio().get(apiGetUser).then((value) {
+      //print('value from api ==> $value');
+      for (var item in json.decode(value.data)) {
+        setState(() {
+          userModel = UserModel.fromMap(item);
+        });
+      }
+    });
+  }
+
+  Future<Null> sendCartToOrder() async {
+    DateTime dateTimeOrder = DateTime.now();
+    String dateTime = DateFormat('yyyy-MM-dd HH:mm').format(dateTimeOrder);
+    String status = 'เตรียมสินค้า';
+    for (var i = 0; i < cartModels.length; i++) {
+      String path =
+          '${Myconstant.domain}/tu2hand/insertOrderBuyer.php?isAdd=true&idSeller=${cartModels[i].idSeller}&idPd=${cartModels[i].idPd}&nameShop=${cartModels[i].nameSeller}&namePd=${cartModels[i].namePd}&pricePd=${cartModels[i].pricePd}&amountPd=${cartModels[i].amountPd}&sumPd=${cartModels[i].sumPd}&idBuyer=${cartModels[i].idBuyer}&nameBuyer=${userModel!.name}&addressBuyer=${userModel!.address}&phoneBuyer=${userModel!.phone}&dateTime=$dateTime&status=$status&imgPd=${cartModels[i].imgPd}';
+      await Dio().get(path).then((value) => null);
+    }
+    String path =
+        '${Myconstant.domain}/tu2hand/deleteAllCartWhereIdBuyer.php?isAdd=true&idBuyer=$idBuyer';
+    await Dio().get(path).then((value) {
+      Navigator.pop(context);
+    });
   }
 }

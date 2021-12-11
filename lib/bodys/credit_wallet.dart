@@ -64,7 +64,7 @@ class _CreditWalletState extends State<CreditWallet> {
         margin: EdgeInsets.symmetric(vertical: 15),
         child: ElevatedButton(
           onPressed: () {
-            orderTread();
+
           },
           child: Text('Add'),
         ),
@@ -185,83 +185,4 @@ class _CreditWalletState extends State<CreditWallet> {
         width: width,
       );
 
-  Future<Null> orderTread() async {
-    await SQLiteHelper().readSQLite().then((value) {
-      sqliteModels = value;
-    });
-    DateTime dateTimeOrder = DateTime.now();
-
-    String dateTime = DateFormat('yyyy-MM-dd HH:mm').format(dateTimeOrder);
-    String idSeller = sqliteModels[0].idSeller;
-    String nameShop = sqliteModels[0].nameSeller;
-
-    List<String> idPds = [];
-    List<String> namePds = [];
-    List<String> pricePds = [];
-    List<String> amountPds = [];
-    List<String> sumPds = [];
-
-    for (var model in sqliteModels) {
-      idPds.add(model.idPd);
-      namePds.add(model.name);
-      pricePds.add(model.price);
-      amountPds.add(model.amount);
-      sumPds.add(model.sum);
-    }
-    String idPd = idPds.toString();
-    String namePd = namePds.toString();
-    String pricePd = pricePds.toString();
-    String amountPd = amountPds.toString();
-    String sumPd = sumPds.toString();
-
-    await findUser();
-
-    String idBuyer = userModel!.id.toString();
-    String nameBuyer = userModel!.name.toString();
-    String addressBuyer = userModel!.address.toString();
-    String phoneBuyer = userModel!.phone.toString();
-    String status = 'preparing';
-
-    print(
-        '### dateTime ==> $dateTime , idSeller ==> $idSeller , idPd ==> $idPd, nameShop ==> $nameShop , namePd ==> $namePd , pricePd ==> $pricePd , amountPd ==> $amountPd , sumPd ==> $sumPd , idBuyer ==> $idBuyer , nameBuyer ==> $nameBuyer , addressBuyer ==> $addressBuyer, phoneBuyer ==> $phoneBuyer, status ==> $status');
-
-    String Url =
-        '${Myconstant.domain}/tu2hand/insertOrderBuyer.php?isAdd=true&idSeller=$idSeller&idPd=$idPd&nameShop=$nameShop&namePd=$namePd&pricePd=$pricePd&amountPd=$amountPd&sumPd=$sumPd&idBuyer=$idBuyer&nameBuyer=$nameBuyer&addressBuyer=$addressBuyer&phoneBuyer=$phoneBuyer&dateTime=$dateTime&status=$status';
-
-    await Dio().get(Url).then((value) {
-      if (value.toString() == 'true') {
-        clearAllData();
-      } else {
-        MyDialog().normalDialog(context, 'ERROR', 'ไม่สามารถสั่ง Order ได้');
-      }
-    });
-  }
-
-  Future<void> findUser() async {
-    SharedPreferences preferences = await SharedPreferences.getInstance();
-    String user = preferences.getString('user')!;
-    String apiGetUser =
-        '${Myconstant.domain}/tu2hand/getUserWhereUser.php?isAdd=true&user=$user';
-    await Dio().get(apiGetUser).then((value) {
-      //print('value from api ==> $value');
-      for (var item in json.decode(value.data)) {
-        setState(() {
-          userModel = UserModel.fromMap(item);
-        });
-      }
-    });
-  }
-
-  Future<Null> clearAllData() async {
-    Fluttertoast.showToast(msg: 'Order Success');
-
-    await SQLiteHelper().clearSQLite().then((value) {
-      Navigator.pop(context);
-      Navigator.pop(context);
-      if (sqliteModels.isNotEmpty) {
-        sqliteModels.clear();
-      }
-      SQLiteHelper().readSQLite();
-    });
-  }
 }

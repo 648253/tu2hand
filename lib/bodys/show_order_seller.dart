@@ -1,9 +1,11 @@
 import 'dart:convert';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:myfirstpro/models/order_model.dart';
 import 'package:myfirstpro/utility/my_constant.dart';
+import 'package:myfirstpro/widgets/show_image.dart';
 import 'package:myfirstpro/widgets/show_progress.dart';
 import 'package:myfirstpro/widgets/show_title.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -17,12 +19,20 @@ class ShowOrderSeller extends StatefulWidget {
 
 class _ShowOrderSellerState extends State<ShowOrderSeller> {
   String? idSeller;
+  bool statusOrder = true;
+  bool load = true;
   List<OrderModel> orderModels = [];
-  List<List<String>> listOrderPd = [];
-  List<List<String>> listPrices = [];
-  List<List<String>> listAmounts = [];
-  List<List<String>> listSums = [];
-  List<int> totals = [];
+  List<String> listOrderNameSellers = [];
+  List<String> listOrderNames = [];
+  List<String> listOrderPrices = [];
+  List<String> listOrderAmounts = [];
+  List<String> listOrderIdBuyer = [];
+  List<String> listOrderNameBuyer = [];
+  List<String> listOrderAddress = [];
+  List<String> listOrderPhone = [];
+  List<String> listOrderSums = [];
+  List<String> listOrderImgs = [];
+  List<int> setStatusInts = [];
 
   @override
   void initState() {
@@ -32,39 +42,30 @@ class _ShowOrderSellerState extends State<ShowOrderSeller> {
   }
 
   Future<Null> findNreadIdSeller() async {
+    if (orderModels.isNotEmpty) {
+      orderModels.clear();
+    }
     SharedPreferences preferences = await SharedPreferences.getInstance();
-    idSeller = preferences.getString(Myconstant().keyId);
-    //print('### idShop ==> $idSeller');
-    String path =
+    idSeller = preferences.getString('id')!;
+    String apiGetIdBuyer =
         '${Myconstant.domain}/tu2hand/getOrderWhereIdSeller.php?isAdd=true&idSeller=$idSeller';
-    await Dio().get(path).then((value) {
-      //print('### value ==> $value');
+    await Dio().get(apiGetIdBuyer).then((value) {
+      //print('value from api ==> $value');
       for (var map in json.decode(value.data)) {
         OrderModel orderModel = OrderModel.fromMap(map);
-      
-        //print('### orderModel ==> ${orderModel}');
-
-        List<String> orderPd = Myconstant().changeToArrays(orderModel.namePd);
-        List<String> orderPrice =
-            Myconstant().changeToArrays(orderModel.pricePd);
-        List<String> orderAmount =
-            Myconstant().changeToArrays(orderModel.amountPd);
-        List<String> orderSum = Myconstant().changeToArrays(orderModel.sumPd);
-
-        int total = 0;
-        for (var string in orderSum) {
-          total = total + int.parse(string.trim());
-        }
-
-        print('### total ==> $total');
-
         setState(() {
+          load = false;
           orderModels.add(orderModel);
-          listOrderPd.add(orderPd);
-          listPrices.add(orderPrice);
-          listAmounts.add(orderAmount);
-          listSums.add(orderSum);
-          totals.add(total);
+          listOrderNameSellers.add(orderModel.nameShop);
+          listOrderNames.add(orderModel.namePd);
+          listOrderPrices.add(orderModel.pricePd);
+          listOrderAmounts.add(orderModel.amountPd);
+          listOrderIdBuyer.add(orderModel.idBuyer);
+          listOrderNameBuyer.add(orderModel.nameBuyer);
+          listOrderAddress.add(orderModel.addressBuyer);
+          listOrderPhone.add(orderModel.phoneBuyer);
+          listOrderSums.add(orderModel.sumPd);
+          listOrderImgs.add(orderModel.imgPd);
         });
       }
     });
@@ -73,137 +74,257 @@ class _ShowOrderSellerState extends State<ShowOrderSeller> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: orderModels.length == 0
+      body: load
           ? ShowProgress()
-          : ListView.builder(
-              itemCount: orderModels.length,
-              itemBuilder: (context, index) => Card(color: index%2 == 0 ? Colors.teal.shade300 : Colors.teal.shade100,
-                shadowColor: Colors.black,
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      buildEmptyBlock(),
-                      buildOrderDetail(index),
-                      Myconstant().buildHeadOrder(),
-                      buildListViewPd(index),
-                      buildTotal(index),
-                      Padding(
-                        padding: const EdgeInsets.only(top: 15),
-                        child: Row(mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: [
-                            ElevatedButton.icon(
-                                style: ElevatedButton.styleFrom(
-                                    shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(20)),
-                                    primary: Colors.red.shade600),
-                                onPressed: () {},
-                                icon: Icon(Icons.cancel_sharp),
-                                label: Text('Cancel')),
-                            ElevatedButton.icon(
-                                style: ElevatedButton.styleFrom(
-                                    shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(20)),
-                                    primary: Colors.green.shade600),
-                                onPressed: () {},
-                                icon: Icon(Icons.cancel_sharp),
-                                label: Text('Confirm')),
-                          ],
-                        ),
-                      ),
-                      buildEmptyBlock(),
-                    ],
-                  ),
-                ),
-              ),
-            ),
+          : orderModels.isEmpty
+              ? showNoOrder()
+              : SingleChildScrollView(child: buildContent()),
     );
   }
 
-  ListView buildListViewPd(int index) => ListView.builder(
-        shrinkWrap: true,
-        physics: ScrollPhysics(),
-        itemCount: listOrderPd[index].length,
-        itemBuilder: (context, index2) => Padding(
-          padding: const EdgeInsets.symmetric(vertical: 7, horizontal: 10),
-          child: Row(
-            children: [
-              Expanded(
-                flex: 3,
-                child: Text(listOrderPd[index][index2]),
-              ),
-              Expanded(
-                flex: 1,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(listPrices[index][index2]),
-                  ],
-                ),
-              ),
-              Expanded(
-                flex: 1,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(listAmounts[index][index2]),
-                  ],
-                ),
-              ),
-              Expanded(
-                flex: 1,
-                child: Text(listSums[index][index2]),
-              ),
-            ],
-          ),
-        ),
-      );
-
-  Widget buildTotal(int index) => Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
+  Center showNoOrder() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Expanded(
-            flex: 3,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                ShowTitle(title: 'Total : '),
-              ],
-            ),
+          Container(
+            margin: EdgeInsets.symmetric(vertical: 16),
+            width: 200,
+            child: showImage(path: Myconstant.image6),
           ),
-          Expanded(
-            flex: 1,
-            child: Row(
-              children: [
-                ShowTitle(
-                  title: ' ${totals[index].toString()} THB',
-                  textStyle: Myconstant().h3WStyle(),
-                )
-              ],
-            ),
-          ),
+          ShowTitle(title: 'ว่างเปล่า!', textStyle: Myconstant().h1Style()),
         ],
-      );
+      ),
+    );
+  }
 
-  Padding buildOrderDetail(int index) {
+  Widget buildContent() {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+      padding: const EdgeInsets.all(16.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          Myconstant().buildEmptyBlock(),
+          Myconstant().buildHeadOrder(),
+          Myconstant().buildEmptyBlock(),
+          listProduct(),
+          Myconstant().buildEmptyBlock(),
+          Myconstant().buildEmptyBlock(),
+          Myconstant().buildEmptyBlock(),
+        ],
+      ),
+    );
+  }
+
+  ListView listProduct() {
+    return ListView.builder(
+      shrinkWrap: true,
+      physics: ScrollPhysics(),
+      itemCount: orderModels.length,
+      itemBuilder: (context, index) => Padding(
+        padding: const EdgeInsets.all(8),
+        child: Column(
+          children: [
+            Row(mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 5,left: 8),
+                  child: ShowTitle(
+                      title: 'ชื่อผู้สั่ง :  ${orderModels[index].nameBuyer}'),
+                ),
+              ],
+            ),
+            Row(mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 5,left: 8),
+                  child: ShowTitle(
+                      title: 'ที่อยู่ :  ${orderModels[index].addressBuyer}'),
+                ),
+              ],
+            ),
+            Row(mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 5,left: 8),
+                  child: ShowTitle(
+                      title: 'เบอร์โทร :  ${orderModels[index].phoneBuyer}'),
+                ),
+              ],
+            ),
+            Myconstant().buildEmptyBlock(),
+            Card(
+              child: Row(
+                children: [
+                  Expanded(
+                    flex: 3,
+                    child: Row(
+                      children: [
+                        Container(
+                          margin: EdgeInsets.only(left: 10),
+                          width: 80,
+                          height: 80,
+                          child: CachedNetworkImage(
+                            fit: BoxFit.cover,
+                            imageUrl:
+                                '${Myconstant.domain}${orderModels[index].imgPd}',
+                            placeholder: (context, url) => ShowProgress(),
+                          ),
+                        ),
+                        Container(
+                          margin: EdgeInsets.only(left: 40, right: 5),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.only(bottom: 5),
+                                child: ShowTitle(
+                                    title:
+                                        'สินค้า : ${orderModels[index].namePd}'),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.only(bottom: 5),
+                                child: ShowTitle(
+                                    textStyle: Myconstant().h2BlStyle(),
+                                    title:
+                                        '฿${Myconstant().moneyFormat(orderModels[index].pricePd)}'),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.only(bottom: 5),
+                                child: ShowTitle(
+                                    title:
+                                        'จำนวน : x${orderModels[index].amountPd}'),
+                              ),
+                              buildDateTimeOrder(index),
+                              Row(
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.only(bottom: 5),
+                                    child: ShowTitle(
+                                        textStyle: Myconstant().h2BlStyle(),
+                                        title: 'สถานะ : '),
+                                  ),
+                                  changeColorsStatus(orderModels[index].status),
+                                  changeIconStatus(orderModels[index].status),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            buttonStatus(index),
+            Divider(
+              thickness: 1,
+              color: Colors.grey.shade400,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Padding changeColorsStatus(String status) {
+    if (status == 'ยกเลิก') {
+      return Padding(
+        padding: const EdgeInsets.only(bottom: 5, left: 5),
+        child: ShowTitle(textStyle: Myconstant().h2Style(), title: '$status'),
+      );
+    } else if (status == 'เตรียมสินค้า') {
+      return Padding(
+        padding: const EdgeInsets.only(bottom: 5, left: 5),
+        child:
+            ShowTitle(textStyle: Myconstant().h2BlaStyle(), title: '$status'),
+      );
+    } else if (status == 'แพ็คสินค้า') {
+      return Padding(
+        padding: const EdgeInsets.only(bottom: 5, left: 5),
+        child: ShowTitle(textStyle: Myconstant().h2BStyle(), title: '$status'),
+      );
+    } else {
+      return Padding(
+        padding: const EdgeInsets.only(bottom: 5, left: 5),
+        child: ShowTitle(textStyle: Myconstant().h2BStyle(), title: '$status'),
+      );
+    }
+  }
+
+  Padding changeIconStatus(String status) {
+    if (status == 'ยกเลิก') {
+      return Padding(
+        padding: const EdgeInsets.only(bottom: 5, left: 10),
+        child: Icon(Icons.cancel_outlined),
+      );
+    } else if (status == 'เตรียมสินค้า') {
+      return Padding(
+        padding: const EdgeInsets.only(bottom: 5, left: 10),
+        child: Icon(Icons.watch_later_outlined),
+      );
+    } else if (status == 'แพ็คสินค้า') {
+      return Padding(
+        padding: const EdgeInsets.only(bottom: 5, left: 10),
+        child: Icon(Icons.archive_outlined),
+      );
+    } else {
+      return Padding(
+        padding: const EdgeInsets.only(bottom: 5, left: 10),
+        child: Icon(Icons.airport_shuttle_outlined),
+      );
+    }
+  }
+
+  Padding buttonStatus(int index) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 5),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          ElevatedButton.icon(
+              style: ElevatedButton.styleFrom(
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20)),
+                  primary: Colors.green.shade600),
+              onPressed: () {
+                String status = 'แพ็คสินค้า';
+                updateStatus(
+                    orderModels[index].idBuyer, orderModels[index].id, status);
+              },
+              icon: Icon(Icons.check),
+              label: Text('Confirm')),
+          ElevatedButton.icon(
+              style: ElevatedButton.styleFrom(
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20)),
+                  primary: Colors.red.shade600),
+              onPressed: () {
+                String status = 'ยกเลิก';
+                updateStatus(
+                    orderModels[index].idBuyer, orderModels[index].id, status);
+              },
+              icon: Icon(Icons.cancel_sharp),
+              label: Text('Cancel')),
+        ],
+      ),
+    );
+  }
+
+  Future<Null> updateStatus(String idBuyer, String id, String status) async {
+    String path =
+        '${Myconstant.domain}/tu2hand/editStatusOrderWhereId.php?isAdd=true&idBuyer=$idBuyer&id=$id&status=$status';
+    Dio().get(path).then((value) => findNreadIdSeller());
+  }
+
+  Container buildDateTimeOrder(int index) {
+    return Container(
+      margin: EdgeInsets.only(bottom: 10),
+      child: Row(
+        children: [
           ShowTitle(
-            title: 'ชื่อผู้สั่ง : ${orderModels[index].nameBuyer}',
-            textStyle: Myconstant().h2Style(),
-          ),
-          ShowTitle(
-            title: 'เวลาออเดอร์ : ${orderModels[index].dateTime}',
-          ),
-          ShowTitle(
-            title: 'ที่อยู่ : ${orderModels[index].addressBuyer}',
-          ),
-          ShowTitle(
-            title: 'มือถือ : ${orderModels[index].phoneBuyer}',
+            title: 'เวลาการสั่งซื้อ : ${orderModels[index].dateTime}',
           ),
         ],
       ),

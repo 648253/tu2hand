@@ -1,11 +1,13 @@
 import 'dart:convert';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:myfirstpro/models/order_model.dart';
 import 'package:myfirstpro/models/user_model.dart';
 import 'package:myfirstpro/utility/my_constant.dart';
 import 'package:myfirstpro/utility/my_dialog.dart';
+import 'package:myfirstpro/widgets/show_image.dart';
 import 'package:myfirstpro/widgets/show_progress.dart';
 import 'package:myfirstpro/widgets/show_title.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -21,12 +23,14 @@ class MyOrderBuyer extends StatefulWidget {
 class _MyOrderBuyerState extends State<MyOrderBuyer> {
   String? idBuyer;
   bool statusOrder = true;
+  bool load = true;
   List<OrderModel> orderModels = [];
-  List<List<String>> listOrderPd = [];
-  List<List<String>> listPrices = [];
-  List<List<String>> listAmounts = [];
-  List<List<String>> listSums = [];
-  List<int> totals = [];
+  List<String> listOrderNameSellers = [];
+  List<String> listOrderNames = [];
+  List<String> listOrderPrices = [];
+  List<String> listOrderAmounts = [];
+  List<String> listOrderSums = [];
+  List<String> listOrderImgs = [];
   List<int> setStatusInts = [];
 
   @override
@@ -39,29 +43,31 @@ class _MyOrderBuyerState extends State<MyOrderBuyer> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: orderModels == null ? showNoOrder() : buildContent(),
+      body: load
+          ? ShowProgress()
+          : orderModels.isEmpty
+              ? showNoOrder()
+              : SingleChildScrollView(child: buildContent()),
     );
   }
 
-  Widget buildContent() => ListView.builder(
-        itemCount: orderModels.length,
-        itemBuilder: (context, index) => Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            children: [
-              buildEmptyBlock(),
-              buildNameShop(index),
-              buildDateTimeOrder(index),
-              Myconstant().buildHeadOrder(),
-              buildListViewPd(index),
-              buildTotal(index),
-              buildEmptyBlock(),
-              buildStepIndicator(setStatusInts[index]),
-              buildEmptyBlock(),
-            ],
-          ),
-        ),
-      );
+  Widget buildContent() {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Myconstant().buildEmptyBlock(),
+          Myconstant().buildHeadOrder(),
+          Myconstant().buildEmptyBlock(),
+          listProduct(),
+          Myconstant().buildEmptyBlock(),
+          Myconstant().buildEmptyBlock(),
+          Myconstant().buildEmptyBlock(),
+        ],
+      ),
+    );
+  }
 
   Widget buildStepIndicator(int step) => Column(
         children: [
@@ -82,10 +88,10 @@ class _MyOrderBuyerState extends State<MyOrderBuyer> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('Canceled'),
-                Text('Preparing'),
-                Text('Packaged'),
-                Text('Delivered'),
+                Text('ยกเลิก'),
+                Text('เตรียมสินค้า'),
+                Text('แพ็คสินค้า'),
+                Text('ดำเนินการส่ง'),
               ],
             ),
           )
@@ -98,73 +104,7 @@ class _MyOrderBuyerState extends State<MyOrderBuyer> {
       height: 10,
     );
   }
-
-  Widget buildTotal(int index) => Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          Expanded(
-            flex: 3,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                ShowTitle(title: 'Total : '),
-              ],
-            ),
-          ),
-          Expanded(
-            flex: 1,
-            child: Row(
-              children: [
-                ShowTitle(
-                  title: ' ${totals[index].toString()} THB',
-                  textStyle: Myconstant().h3BStyle(),
-                )
-              ],
-            ),
-          ),
-        ],
-      );
-
-  ListView buildListViewPd(int index) => ListView.builder(
-        shrinkWrap: true,
-        physics: ScrollPhysics(),
-        itemCount: listOrderPd[index].length,
-        itemBuilder: (context, index2) => Padding(
-          padding: const EdgeInsets.symmetric(vertical: 7),
-          child: Row(
-            children: [
-              Expanded(
-                flex: 3,
-                child: Text(listOrderPd[index][index2]),
-              ),
-              Expanded(
-                flex: 1,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(listPrices[index][index2]),
-                  ],
-                ),
-              ),
-              Expanded(
-                flex: 1,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(listAmounts[index][index2]),
-                  ],
-                ),
-              ),
-              Expanded(
-                flex: 1,
-                child: Text(listSums[index][index2]),
-              ),
-            ],
-          ),
-        ),
-      );
-
-
+  
 
   Container buildDateTimeOrder(int index) {
     return Container(
@@ -172,8 +112,7 @@ class _MyOrderBuyerState extends State<MyOrderBuyer> {
       child: Row(
         children: [
           ShowTitle(
-            title: 'Order Time : ${orderModels[index].dateTime}',
-            textStyle: Myconstant().h2BlStyle(),
+            title: 'เวลาการสั่งซื้อ : ${orderModels[index].dateTime}',
           ),
         ],
       ),
@@ -192,13 +131,17 @@ class _MyOrderBuyerState extends State<MyOrderBuyer> {
   }
 
   Center showNoOrder() {
-    ShowProgress();
     return Center(
-      child: Container(
-        child: Text(
-          'Order is Empty!',
-          style: Myconstant().h1Style(),
-        ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            margin: EdgeInsets.symmetric(vertical: 16),
+            width: 200,
+            child: showImage(path: Myconstant.image6),
+          ),
+          ShowTitle(title: 'ว่างเปล่า!', textStyle: Myconstant().h1Style()),
+        ],
       ),
     );
   }
@@ -212,47 +155,110 @@ class _MyOrderBuyerState extends State<MyOrderBuyer> {
       //print('value from api ==> $value');
       for (var map in json.decode(value.data)) {
         OrderModel orderModel = OrderModel.fromMap(map);
-        List<String> orderPd = Myconstant().changeToArrays(orderModel.namePd);
-        List<String> orderPrice = Myconstant().changeToArrays(orderModel.pricePd);
-        List<String> orderAmount = Myconstant().changeToArrays(orderModel.amountPd);
-        List<String> orderSum = Myconstant().changeToArrays(orderModel.sumPd);
         int status = updateStatus(orderModel);
-
-        int total = 0;
-        for (var string in orderSum) {
-          total = total + int.parse(string.trim());
-        }
-
-        //print('### total ==> $total');
-
-        print('my string/// ==> $orderPd');
         setState(() {
-          statusOrder = false;
+          load = false;
           orderModels.add(orderModel);
-          listOrderPd.add(orderPd);
-          listPrices.add(orderPrice);
-          listAmounts.add(orderAmount);
-          listSums.add(orderSum);
-          totals.add(total);
+          listOrderNameSellers.add(orderModel.nameShop);
+          listOrderNames.add(orderModel.namePd);
+          listOrderPrices.add(orderModel.pricePd);
+          listOrderAmounts.add(orderModel.amountPd);
+          listOrderSums.add(orderModel.sumPd);
+          listOrderImgs.add(orderModel.imgPd);
           setStatusInts.add(status);
         });
       }
     });
   }
 
+  ListView listProduct() {
+    return ListView.builder(
+      shrinkWrap: true,
+      physics: ScrollPhysics(),
+      itemCount: orderModels.length,
+      itemBuilder: (context, index) => Padding(
+        padding: const EdgeInsets.all(8),
+        child: Column(
+          children: [
+            Card(
+              child: Row(
+                children: [
+                  Expanded(
+                    flex: 3,
+                    child: Row(
+                      children: [
+                        Container(
+                          margin: EdgeInsets.only(left: 10),
+                          width: 80,
+                          height: 80,
+                          child: CachedNetworkImage(
+                            fit: BoxFit.cover,
+                            imageUrl:
+                                '${Myconstant.domain}${orderModels[index].imgPd}',
+                            placeholder: (context, url) => ShowProgress(),
+                          ),
+                        ),
+                        Container(
+                          margin: EdgeInsets.only(left: 40, right: 5),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.only(bottom: 5),
+                                child: ShowTitle(
+                                    title:
+                                        'ร้าน :  ${orderModels[index].nameShop}'),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.only(bottom: 5),
+                                child: ShowTitle(
+                                    title:
+                                        'สินค้า : ${orderModels[index].namePd}'),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.only(bottom: 5),
+                                child: ShowTitle(
+                                    textStyle: Myconstant().h2BlStyle(),
+                                    title:
+                                        '฿${Myconstant().moneyFormat(orderModels[index].pricePd)}'),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.only(bottom: 5),
+                                child: ShowTitle(
+                                    title:
+                                        'จำนวน : x${orderModels[index].amountPd}'),
+                              ),
+                              buildDateTimeOrder(index),
+                              
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            buildStepIndicator(setStatusInts[index]),
+          ],
+        ),
+      ),
+    );
+  }
+
   int updateStatus(OrderModel orderModel) {
     int status = 0;
     switch (orderModel.status) {
-      case 'cancel':
+      case 'ยกเลิก':
         status = 0;
         break;
-      case 'preparing':
+      case 'เตรียมสินค้า':
         status = 1;
         break;
-      case 'packaged':
+      case 'แพ็คสินค้า':
         status = 2;
         break;
-      case 'delivered':
+      case 'ดำเนินการส่ง':
         status = 3;
         break;
       default:

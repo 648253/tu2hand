@@ -15,6 +15,7 @@ class OrderModel {
   String phoneBuyer;
   String dateTime;
   String status;
+  String imgPd;
   OrderModel({
     required this.id,
     required this.idSeller,
@@ -30,6 +31,7 @@ class OrderModel {
     required this.phoneBuyer,
     required this.dateTime,
     required this.status,
+    required this.imgPd,
   });
 
   OrderModel copyWith({
@@ -47,6 +49,7 @@ class OrderModel {
     String? phoneBuyer,
     String? dateTime,
     String? status,
+    String? imgPd,
   }) {
     return OrderModel(
       id: id ?? this.id,
@@ -63,6 +66,7 @@ class OrderModel {
       phoneBuyer: phoneBuyer ?? this.phoneBuyer,
       dateTime: dateTime ?? this.dateTime,
       status: status ?? this.status,
+      imgPd: imgPd ?? this.imgPd,
     );
   }
 
@@ -82,25 +86,27 @@ class OrderModel {
       'phoneBuyer': phoneBuyer,
       'dateTime': dateTime,
       'status': status,
+      'imgPd': imgPd,
     };
   }
 
   factory OrderModel.fromMap(Map<String, dynamic> map) {
     return OrderModel(
-      id: map['id'],
-      idSeller: map['idSeller'],
-      idPd: map['idPd'],
-      nameShop: map['nameShop'],
-      namePd: map['namePd'],
-      pricePd: map['pricePd'],
-      amountPd: map['amountPd'],
-      sumPd: map['sumPd'],
-      idBuyer: map['idBuyer'],
-      nameBuyer: map['nameBuyer'],
-      addressBuyer: map['addressBuyer'],
-      phoneBuyer: map['phoneBuyer'],
-      dateTime: map['dateTime'],
-      status: map['status'],
+      id: map['id'] ?? '',
+      idSeller: map['idSeller'] ?? '',
+      idPd: map['idPd'] ?? '',
+      nameShop: map['nameShop'] ?? '',
+      namePd: map['namePd'] ?? '',
+      pricePd: map['pricePd'] ?? '',
+      amountPd: map['amountPd'] ?? '',
+      sumPd: map['sumPd'] ?? '',
+      idBuyer: map['idBuyer'] ?? '',
+      nameBuyer: map['nameBuyer'] ?? '',
+      addressBuyer: map['addressBuyer'] ?? '',
+      phoneBuyer: map['phoneBuyer'] ?? '',
+      dateTime: map['dateTime'] ?? '',
+      status: map['status'] ?? '',
+      imgPd: map['imgPd'] ?? '',
     );
   }
 
@@ -110,7 +116,7 @@ class OrderModel {
 
   @override
   String toString() {
-    return 'OrderModel(id: $id, idSeller: $idSeller, idPd: $idPd, nameShop: $nameShop, namePd: $namePd, pricePd: $pricePd, amountPd: $amountPd, sumPd: $sumPd, idBuyer: $idBuyer, nameBuyer: $nameBuyer, addressBuyer: $addressBuyer, phoneBuyer: $phoneBuyer, dateTime: $dateTime, status: $status)';
+    return 'OrderModel(id: $id, idSeller: $idSeller, idPd: $idPd, nameShop: $nameShop, namePd: $namePd, pricePd: $pricePd, amountPd: $amountPd, sumPd: $sumPd, idBuyer: $idBuyer, nameBuyer: $nameBuyer, addressBuyer: $addressBuyer, phoneBuyer: $phoneBuyer, dateTime: $dateTime, status: $status, imgPd: $imgPd)';
   }
 
   @override
@@ -131,7 +137,8 @@ class OrderModel {
       other.addressBuyer == addressBuyer &&
       other.phoneBuyer == phoneBuyer &&
       other.dateTime == dateTime &&
-      other.status == status;
+      other.status == status &&
+      other.imgPd == imgPd;
   }
 
   @override
@@ -149,6 +156,7 @@ class OrderModel {
       addressBuyer.hashCode ^
       phoneBuyer.hashCode ^
       dateTime.hashCode ^
-      status.hashCode;
+      status.hashCode ^
+      imgPd.hashCode;
   }
 }
