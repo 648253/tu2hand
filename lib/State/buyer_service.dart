@@ -7,7 +7,9 @@ import 'package:myfirstpro/bodys/my_order.dart';
 import 'package:myfirstpro/bodys/my_money.dart';
 import 'package:myfirstpro/bodys/show_all_shop_buyer.dart';
 import 'package:myfirstpro/models/cart_model.dart';
+import 'package:myfirstpro/models/user_model.dart';
 import 'package:myfirstpro/utility/my_constant.dart';
+import 'package:myfirstpro/widgets/show_progress.dart';
 import 'package:myfirstpro/widgets/show_signout.dart';
 import 'package:myfirstpro/widgets/show_title.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -24,6 +26,7 @@ class _BuyerServiceState extends State<BuyerService> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    findUserModel();
     findDetailSeller();
   }
 
@@ -35,6 +38,7 @@ class _BuyerServiceState extends State<BuyerService> {
   List<CartModel> cartModels = [];
   int indexWidgets = 0;
   String? idBuyer;
+  UserModel? userModel;
 
   @override
   Widget build(BuildContext context) {
@@ -61,22 +65,24 @@ class _BuyerServiceState extends State<BuyerService> {
         ],
         title: Text('Buyer'),
       ),
-      drawer: Drawer(
-        child: Stack(
-          children: [
-            Column(
-              children: [
-                buildHeader(),
-                menuShowAllShop(),
-                menuMyMoney(),
-                menuMyOrder(),
-              ],
+      drawer: widgets.length == 0
+          ? SizedBox()
+          : Drawer(
+              child: Stack(
+                children: [
+                  Column(
+                    children: [
+                      buildHeader(),
+                      menuShowAllShop(),
+                      menuMyMoney(),
+                      menuMyOrder(),
+                    ],
+                  ),
+                  ShowSignOut(),
+                ],
+              ),
             ),
-            ShowSignOut(),
-          ],
-        ),
-      ),
-      body: widgets[indexWidgets],
+      body: widgets.length == 0 ? ShowProgress() : widgets[indexWidgets],
     );
   }
 
@@ -163,6 +169,49 @@ class _BuyerServiceState extends State<BuyerService> {
     );
   }
 
-  UserAccountsDrawerHeader buildHeader() =>
-      UserAccountsDrawerHeader(accountName: null, accountEmail: null);
+  UserAccountsDrawerHeader buildHeader() {
+    return UserAccountsDrawerHeader(
+        otherAccountsPictures: [
+          IconButton(
+            onPressed: () {},
+            icon: Icon(Icons.portrait),
+            iconSize: 36,
+            color: Myconstant.light,
+            tooltip: 'Edit Profile',
+          ),
+        ],
+        decoration: BoxDecoration(
+          gradient: RadialGradient(
+            colors: [Myconstant.light, Myconstant.dark],
+            center: Alignment(-0.7, -0.2),
+            radius: 1,
+          ),
+        ),
+        currentAccountPicture: CircleAvatar(
+          backgroundImage:
+              NetworkImage('${Myconstant.domain}${userModel?.img}'),
+        ),
+        accountName: Text(userModel == null ? 'Name ?' : userModel!.name),
+        accountEmail: Text(userModel == null ? 'Type ?' : userModel!.type));
+  }
+
+  Future<Null> findUserModel() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    String id = '3';
+    print('## id login ==> $id');
+    String apiGetUserWhereId =
+        '${Myconstant.domain}/tu2hand/getUserWhereId.php?isAdd=true&id=$id';
+    await Dio().get(apiGetUserWhereId).then((value) {
+      print('## value ==> $value');
+      for (var item in json.decode(value.data)) {
+        setState(() {
+          userModel = UserModel.fromMap(item);
+          print('${userModel!.img}');
+          widgets.add(ShowAllShopBuyer());
+          widgets.add(MyMoneyBuyer());
+          widgets.add(MyOrderBuyer());
+        });
+      }
+    });
+  }
 }

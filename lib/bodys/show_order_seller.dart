@@ -50,23 +50,29 @@ class _ShowOrderSellerState extends State<ShowOrderSeller> {
     String apiGetIdBuyer =
         '${Myconstant.domain}/tu2hand/getOrderWhereIdSeller.php?isAdd=true&idSeller=$idSeller';
     await Dio().get(apiGetIdBuyer).then((value) {
-      //print('value from api ==> $value');
-      for (var map in json.decode(value.data)) {
-        OrderModel orderModel = OrderModel.fromMap(map);
+      String s = value.data.toString();
+      if (s == 'null') {
         setState(() {
           load = false;
-          orderModels.add(orderModel);
-          listOrderNameSellers.add(orderModel.nameShop);
-          listOrderNames.add(orderModel.namePd);
-          listOrderPrices.add(orderModel.pricePd);
-          listOrderAmounts.add(orderModel.amountPd);
-          listOrderIdBuyer.add(orderModel.idBuyer);
-          listOrderNameBuyer.add(orderModel.nameBuyer);
-          listOrderAddress.add(orderModel.addressBuyer);
-          listOrderPhone.add(orderModel.phoneBuyer);
-          listOrderSums.add(orderModel.sumPd);
-          listOrderImgs.add(orderModel.imgPd);
         });
+      } else {
+        for (var map in json.decode(value.data)) {
+          OrderModel orderModel = OrderModel.fromMap(map);
+          setState(() {
+            load = false;
+            orderModels.add(orderModel);
+            listOrderNameSellers.add(orderModel.nameShop);
+            listOrderNames.add(orderModel.namePd);
+            listOrderPrices.add(orderModel.pricePd);
+            listOrderAmounts.add(orderModel.amountPd);
+            listOrderIdBuyer.add(orderModel.idBuyer);
+            listOrderNameBuyer.add(orderModel.nameBuyer);
+            listOrderAddress.add(orderModel.addressBuyer);
+            listOrderPhone.add(orderModel.phoneBuyer);
+            listOrderSums.add(orderModel.sumPd);
+            listOrderImgs.add(orderModel.imgPd);
+          });
+        }
       }
     });
   }
@@ -90,9 +96,9 @@ class _ShowOrderSellerState extends State<ShowOrderSeller> {
           Container(
             margin: EdgeInsets.symmetric(vertical: 16),
             width: 200,
-            child: showImage(path: Myconstant.image6),
+            child: showImage(path: Myconstant.image8),
           ),
-          ShowTitle(title: 'ว่างเปล่า!', textStyle: Myconstant().h1Style()),
+          ShowTitle(title: 'ไม่มีออเดอร์!', textStyle: Myconstant().h1Style()),
         ],
       ),
     );
@@ -125,28 +131,31 @@ class _ShowOrderSellerState extends State<ShowOrderSeller> {
         padding: const EdgeInsets.all(8),
         child: Column(
           children: [
-            Row(mainAxisAlignment: MainAxisAlignment.start,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 Padding(
-                  padding: const EdgeInsets.only(bottom: 5,left: 8),
+                  padding: const EdgeInsets.only(bottom: 5, left: 8),
                   child: ShowTitle(
                       title: 'ชื่อผู้สั่ง :  ${orderModels[index].nameBuyer}'),
                 ),
               ],
             ),
-            Row(mainAxisAlignment: MainAxisAlignment.start,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 Padding(
-                  padding: const EdgeInsets.only(bottom: 5,left: 8),
+                  padding: const EdgeInsets.only(bottom: 5, left: 8),
                   child: ShowTitle(
                       title: 'ที่อยู่ :  ${orderModels[index].addressBuyer}'),
                 ),
               ],
             ),
-            Row(mainAxisAlignment: MainAxisAlignment.start,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 Padding(
-                  padding: const EdgeInsets.only(bottom: 5,left: 8),
+                  padding: const EdgeInsets.only(bottom: 5, left: 8),
                   child: ShowTitle(
                       title: 'เบอร์โทร :  ${orderModels[index].phoneBuyer}'),
                 ),
@@ -172,7 +181,7 @@ class _ShowOrderSellerState extends State<ShowOrderSeller> {
                           ),
                         ),
                         Container(
-                          margin: EdgeInsets.only(left: 40, right: 5),
+                          margin: EdgeInsets.only(left: 30, right: 5),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [

@@ -91,7 +91,7 @@ class _ShowProductSellerState extends State<ShowProductSeller> {
         onPressed: () =>
             Navigator.pushNamed(context, Myconstant.routeSellerServiceAddPd)
                 .then((value) => loadValueFromAPI()),
-        child: Text('+'),
+        child: ShowTitle(title: 'เพิ่ม',textStyle: Myconstant().h2WStyle(),),
       ),
     );
   }
@@ -110,7 +110,7 @@ class _ShowProductSellerState extends State<ShowProductSeller> {
         child: Row(
           children: [
             Container(
-              padding: EdgeInsets.all(4),
+              padding: EdgeInsets.all(8),
               width: constraints.maxWidth * 0.5 - 4,
               height: constraints.maxWidth * 0.5,
               child: Column(

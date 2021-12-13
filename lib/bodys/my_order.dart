@@ -104,7 +104,6 @@ class _MyOrderBuyerState extends State<MyOrderBuyer> {
       height: 10,
     );
   }
-  
 
   Container buildDateTimeOrder(int index) {
     return Container(
@@ -138,7 +137,7 @@ class _MyOrderBuyerState extends State<MyOrderBuyer> {
           Container(
             margin: EdgeInsets.symmetric(vertical: 16),
             width: 200,
-            child: showImage(path: Myconstant.image6),
+            child: showImage(path: Myconstant.image9),
           ),
           ShowTitle(title: 'ว่างเปล่า!', textStyle: Myconstant().h1Style()),
         ],
@@ -152,21 +151,27 @@ class _MyOrderBuyerState extends State<MyOrderBuyer> {
     String apiGetIdBuyer =
         '${Myconstant.domain}/tu2hand/getOrderWhereIdBuyer.php?isAdd=true&idBuyer=$idBuyer';
     await Dio().get(apiGetIdBuyer).then((value) {
-      //print('value from api ==> $value');
-      for (var map in json.decode(value.data)) {
-        OrderModel orderModel = OrderModel.fromMap(map);
-        int status = updateStatus(orderModel);
+      String s = value.data.toString();
+      if (s == 'null') {
         setState(() {
           load = false;
-          orderModels.add(orderModel);
-          listOrderNameSellers.add(orderModel.nameShop);
-          listOrderNames.add(orderModel.namePd);
-          listOrderPrices.add(orderModel.pricePd);
-          listOrderAmounts.add(orderModel.amountPd);
-          listOrderSums.add(orderModel.sumPd);
-          listOrderImgs.add(orderModel.imgPd);
-          setStatusInts.add(status);
         });
+      } else {
+        for (var map in json.decode(value.data)) {
+          OrderModel orderModel = OrderModel.fromMap(map);
+          int status = updateStatus(orderModel);
+          setState(() {
+            load = false;
+            orderModels.add(orderModel);
+            listOrderNameSellers.add(orderModel.nameShop);
+            listOrderNames.add(orderModel.namePd);
+            listOrderPrices.add(orderModel.pricePd);
+            listOrderAmounts.add(orderModel.amountPd);
+            listOrderSums.add(orderModel.sumPd);
+            listOrderImgs.add(orderModel.imgPd);
+            setStatusInts.add(status);
+          });
+        }
       }
     });
   }
@@ -188,7 +193,7 @@ class _MyOrderBuyerState extends State<MyOrderBuyer> {
                     child: Row(
                       children: [
                         Container(
-                          margin: EdgeInsets.only(left: 10),
+                          margin: EdgeInsets.only(left: 8),
                           width: 80,
                           height: 80,
                           child: CachedNetworkImage(
@@ -199,7 +204,7 @@ class _MyOrderBuyerState extends State<MyOrderBuyer> {
                           ),
                         ),
                         Container(
-                          margin: EdgeInsets.only(left: 40, right: 5),
+                          margin: EdgeInsets.only(left: 30, right: 5),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -229,7 +234,6 @@ class _MyOrderBuyerState extends State<MyOrderBuyer> {
                                         'จำนวน : x${orderModels[index].amountPd}'),
                               ),
                               buildDateTimeOrder(index),
-                              
                             ],
                           ),
                         ),

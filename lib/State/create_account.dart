@@ -1,12 +1,17 @@
+import 'package:crypto/crypto.dart';
+import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
+import 'package:encrypt/encrypt.dart' as encrypt;
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:form_field_validator/form_field_validator.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:myfirstpro/main.dart';
+import 'package:myfirstpro/utility/encrypt.dart';
 import 'package:myfirstpro/utility/my_constant.dart';
 import 'package:myfirstpro/utility/my_dialog.dart';
 import 'package:myfirstpro/widgets/show_image.dart';
@@ -26,12 +31,15 @@ class _CreateAccountState extends State<CreateAccount> {
   File? file;
   bool statusRedEyes = true;
   double? lat, long;
+  var encryptedText;
   final formKey = GlobalKey<FormState>();
   TextEditingController nameController = TextEditingController();
   TextEditingController addressController = TextEditingController();
   TextEditingController phoneController = TextEditingController();
   TextEditingController userController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
+
+  get sha256 => null;
 
   @override
   void initState() {
@@ -103,11 +111,10 @@ class _CreateAccountState extends State<CreateAccount> {
           width: size * 0.6,
           child: TextFormField(
             controller: nameController,
-            validator: (value) {
-              if (value!.isEmpty) {
-                return 'กรุณาระบุส่วนนี้';
-              } else {}
-            },
+            validator: MultiValidator([
+              RequiredValidator(errorText: 'กรุณาระบุส่วนนี้'),
+              MaxLengthValidator(20, errorText: 'ชื่อไม่ควรเกิน 20 ตัวอักษร')
+            ]),
             decoration: InputDecoration(
               labelStyle: Myconstant().h3Style(),
               labelText: 'Name :',
@@ -137,11 +144,9 @@ class _CreateAccountState extends State<CreateAccount> {
           width: size * 0.6,
           child: TextFormField(
             controller: addressController,
-            validator: (value) {
-              if (value!.isEmpty) {
-                return 'กรุณาระบุส่วนนี้';
-              } else {}
-            },
+            validator: MultiValidator([
+              RequiredValidator(errorText: 'กรุณาระบุส่วนนี้'),
+            ]),
             maxLines: 3,
             decoration: InputDecoration(
               hintText: 'Address :',
@@ -176,11 +181,9 @@ class _CreateAccountState extends State<CreateAccount> {
           child: TextFormField(
             controller: phoneController,
             keyboardType: TextInputType.phone,
-            validator: (value) {
-              if (value!.isEmpty) {
-                return 'กรุณาระบุส่วนนี้';
-              } else {}
-            },
+            validator: MultiValidator([
+              RequiredValidator(errorText: 'กรุณาระบุส่วนนี้'),
+            ]),
             decoration: InputDecoration(
               labelStyle: Myconstant().h3Style(),
               labelText: 'Phone :',
@@ -210,11 +213,9 @@ class _CreateAccountState extends State<CreateAccount> {
           width: size * 0.6,
           child: TextFormField(
             controller: userController,
-            validator: (value) {
-              if (value!.isEmpty) {
-                return 'กรุณาระบุส่วนนี้';
-              } else {}
-            },
+            validator: MultiValidator([
+              RequiredValidator(errorText: 'กรุณาระบุส่วนนี้'),
+            ]),
             decoration: InputDecoration(
               labelStyle: Myconstant().h3Style(),
               labelText: 'UserName :',
@@ -244,11 +245,11 @@ class _CreateAccountState extends State<CreateAccount> {
           width: size * 0.6,
           child: TextFormField(
             controller: passwordController,
-            validator: (value) {
-              if (value!.isEmpty) {
-                return 'กรุณาระบุส่วนนี้';
-              } else {}
-            },
+            validator: MultiValidator([
+              RequiredValidator(errorText: 'กรุณาระบุส่วนนี้'),
+              MinLengthValidator(8,
+                  errorText: 'ความยาวของ Password อย่างน้อย 8 ตัวอักษร'),
+            ]),
             obscureText: statusRedEyes,
             decoration: InputDecoration(
               suffixIcon: IconButton(
@@ -348,13 +349,14 @@ class _CreateAccountState extends State<CreateAccount> {
   }
 
   Future<Null> uploadPicAndInsertData() async {
-    String name = nameController.text;
+    String name = nameController.text.toLowerCase();
     String address = addressController.text;
     String phone = phoneController.text;
     String user = userController.text;
-    String password = passwordController.text;
+    encryptedText = EncryptAndDecrypt.encryptAES(passwordController.text);
+    //print('################## ${EncryptAndDecrypt.decryptAES(encryptedText)}');
     print(
-        "### name = $name, address = $address, phone = $phone, user = $user, password = $password");
+        "### name = $name, address = $address, phone = $phone, user = $user, password = ${encryptedText.base64}");
     String path =
         '${Myconstant.domain}/tu2hand/getUserWhereUser.php?isAdd=true&user=$user';
     await Dio().get(path).then((value) async {
@@ -369,7 +371,7 @@ class _CreateAccountState extends State<CreateAccount> {
             address: address,
             phone: phone,
             user: user,
-            password: password,
+            password: encryptedText.base64,
           );
         } else {
           //img
@@ -388,7 +390,7 @@ class _CreateAccountState extends State<CreateAccount> {
               address: address,
               phone: phone,
               user: user,
-              password: password,
+              password: encryptedText.base64,
             );
           });
         }
@@ -405,7 +407,7 @@ class _CreateAccountState extends State<CreateAccount> {
       String? phone,
       String? user,
       String? password}) async {
-    print('## processInsertMySQL and img is work ==>> $userImg');
+    print('## processInsertMySQL and img is work ==>> $password');
     String apiInsertUser =
         '${Myconstant.domain}/tu2hand/insertUser.php?isAdd=true&name=$name&type=$typeUser&address=$address&phone=$phone&user=$user&password=$password&img=$userImg&lat=$lat&long=$long';
     await Dio().get(apiInsertUser).then((value) {

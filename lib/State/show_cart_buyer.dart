@@ -142,7 +142,7 @@ class _ShowCartBuyerState extends State<ShowCartBuyer> {
         ),
         Container(
             margin: EdgeInsets.symmetric(
-              horizontal: 16,
+              horizontal: 8,
             ),
             child: ElevatedButton(
               onPressed: () => confirmEmptyCart(),

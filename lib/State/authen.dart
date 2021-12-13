@@ -4,6 +4,7 @@ import 'package:crypt/crypt.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:myfirstpro/models/user_model.dart';
+import 'package:myfirstpro/utility/encrypt.dart';
 import 'package:myfirstpro/utility/my_constant.dart';
 import 'package:myfirstpro/utility/my_dialog.dart';
 import 'package:myfirstpro/widgets/show_image.dart';
@@ -20,6 +21,8 @@ class Authen extends StatefulWidget {
 
 class _AuthenState extends State<Authen> {
   bool statusRedEyes = true;
+  var encryptedText, plainText;
+  var decryptedText;
   final formKey = GlobalKey<FormState>();
   TextEditingController userController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
@@ -77,12 +80,15 @@ class _AuthenState extends State<Authen> {
               style: Myconstant().myButtonStyle(),
               onPressed: () {
                 if (formKey.currentState!.validate()) {
-                  String user = userController.text;
-                  String password = passwordController.text;
+                  String user = userController.text.toLowerCase();
+                  String passWord = passwordController.text;
+                  
 
+                  encryptedText =
+                      EncryptAndDecrypt.encryptAES(passWord);
 
-                  print('## user =$user, ## password = $password');
-                  checkAuthen(user: user, password: password);
+                      checkAuthen(user: user, password: encryptedText.base64);
+
                 } else {}
               },
               child: Text('Login'),
@@ -95,7 +101,7 @@ class _AuthenState extends State<Authen> {
     String apiCheckAuthen =
         '${Myconstant.domain}/tu2hand/getUserWhereUser.php?isAdd=true&user=$user';
     await Dio().get(apiCheckAuthen).then((value) async {
-      print('## value for API ==> $value');
+      //print('## value for API ==> $value');
       if (value.toString() == 'null') {
         MyDialog()
             .normalDialog(context, 'User false!', 'No $user in My Database');

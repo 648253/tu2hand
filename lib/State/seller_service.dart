@@ -59,7 +59,7 @@ class _SellerServiceState extends State<SellerService> {
         title: userModel == null ? ShowProgress() : Text('${userModel!.name}'),
       ),
       drawer: widgets.length == 0
-          ? SizedBox()
+          ? ShowProgress()
           : Drawer(
               child: Stack(
                 children: [
