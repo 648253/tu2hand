@@ -126,8 +126,8 @@ class _ShowProductBuyerState extends State<ShowProductBuyer> {
             child: Row(
               children: [
                 Container(
-                  width: constraints.maxWidth * 0.5 - 8,
-                  height: constraints.maxWidth * 0.5 - 8,
+                  width: constraints.maxWidth * 0.4 - 8,
+                  height: constraints.maxWidth * 0.3 - 8,
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: CachedNetworkImage(
@@ -153,14 +153,16 @@ class _ShowProductBuyerState extends State<ShowProductBuyer> {
                               title: productModels[index].namePd,
                               textStyle: Myconstant().h2Style(),
                             ),
+                            Myconstant().buildEmptyBlock(),
                             ShowTitle(
                               title:
-                                  'Price = ${productModels[index].pricePd} THB',
-                              textStyle: Myconstant().h3Style(),
+                                  'ราคา : ฿${Myconstant().moneyFormat(productModels[index].pricePd)}',
+                              textStyle: Myconstant().h2BlStyle(),
                             ),
+                            Myconstant().buildEmptyBlock(),
                             ShowTitle(
                               title: cutWord(
-                                  'Detail : ${productModels[index].detailPd}'),
+                                  'รายละเอียด : ${productModels[index].detailPd}'),
                               textStyle: Myconstant().h3Style(),
                             ),
                           ],
@@ -217,7 +219,6 @@ class _ShowProductBuyerState extends State<ShowProductBuyer> {
       ProductModel productModel, List<String> images, StateSetter setState) {
     return AlertDialog(
       title: ListTile(
-        trailing: showImage(path: Myconstant.image1),
         title: ShowTitle(
           title: productModel.namePd,
           textStyle: Myconstant().h2Style(),
@@ -226,7 +227,7 @@ class _ShowProductBuyerState extends State<ShowProductBuyer> {
           padding: const EdgeInsets.only(top: 8),
           child: ShowTitle(
             title: '฿ ${Myconstant().moneyFormat(productModel.pricePd)}',
-            textStyle: Myconstant().h2Style(),
+            textStyle: Myconstant().h1BStyle(),
           ),
         ),
       ),

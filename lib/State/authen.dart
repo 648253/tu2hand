@@ -82,13 +82,10 @@ class _AuthenState extends State<Authen> {
                 if (formKey.currentState!.validate()) {
                   String user = userController.text.toLowerCase();
                   String passWord = passwordController.text;
-                  
 
-                  encryptedText =
-                      EncryptAndDecrypt.encryptAES(passWord);
+                  encryptedText = EncryptAndDecrypt.encryptAES(passWord);
 
-                      checkAuthen(user: user, password: encryptedText.base64);
-
+                  checkAuthen(user: user, password: encryptedText.base64);
                 } else {}
               },
               child: Text('Login'),
@@ -235,9 +232,15 @@ class _AuthenState extends State<Authen> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        ShowTitle(
-          title: Myconstant.appName,
-          textStyle: Myconstant().h1Style(),
+        Column(
+          children: [
+            Myconstant().buildEmptyBlock(),
+            Myconstant().buildEmptyBlock(),
+            ShowTitle(
+              title: Myconstant.appName,
+              textStyle: Myconstant().h1Style(),
+            ),
+          ],
         ),
       ],
     );
@@ -247,7 +250,16 @@ class _AuthenState extends State<Authen> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Container(width: size * 0.9, child: showImage(path: Myconstant.image5)),
+        Column(
+          children: [
+            Myconstant().buildEmptyBlock(),
+            Myconstant().buildEmptyBlock(),
+            Myconstant().buildEmptyBlock(),
+            Myconstant().buildEmptyBlock(),
+            Container(
+                width: size * 0.3, child: showImage(path: Myconstant.image11)),
+          ],
+        ),
       ],
     );
   }

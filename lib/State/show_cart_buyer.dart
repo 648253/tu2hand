@@ -179,7 +179,7 @@ class _ShowCartBuyerState extends State<ShowCartBuyer> {
                           ),
                         ),
                         Container(
-                          margin: EdgeInsets.only(left: 48),
+                          margin: EdgeInsets.only(left: 24),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [

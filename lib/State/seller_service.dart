@@ -82,13 +82,6 @@ class _SellerServiceState extends State<SellerService> {
   UserAccountsDrawerHeader buildHeader() {
     return UserAccountsDrawerHeader(
         otherAccountsPictures: [
-          IconButton(
-            onPressed: () {},
-            icon: Icon(Icons.portrait),
-            iconSize: 36,
-            color: Myconstant.light,
-            tooltip: 'Edit Profile',
-          ),
         ],
         decoration: BoxDecoration(
           gradient: RadialGradient(
@@ -113,7 +106,7 @@ class _SellerServiceState extends State<SellerService> {
           Navigator.pop(context);
         });
       },
-      leading: Icon(Icons.filter_1),
+      leading: Icon(Icons.shopping_bag_outlined),
       title: ShowTitle(
         title: 'Show Order',
         textStyle: Myconstant().h2Style(),
@@ -133,7 +126,7 @@ class _SellerServiceState extends State<SellerService> {
           Navigator.pop(context);
         });
       },
-      leading: Icon(Icons.filter_2),
+      leading: Icon(Icons.manage_accounts_outlined),
       title: ShowTitle(
         title: 'Show Manage',
         textStyle: Myconstant().h2Style(),
@@ -153,7 +146,7 @@ class _SellerServiceState extends State<SellerService> {
           Navigator.pop(context);
         });
       },
-      leading: Icon(Icons.filter_3),
+      leading: Icon(Icons.category_outlined),
       title: ShowTitle(
         title: 'Show Product',
         textStyle: Myconstant().h2Style(),

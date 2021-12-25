@@ -144,10 +144,13 @@ class _ShowOrderSellerState extends State<ShowOrderSeller> {
             Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 5, left: 8),
-                  child: ShowTitle(
-                      title: 'ที่อยู่ :  ${orderModels[index].addressBuyer}'),
+                Flexible(
+                  child: Padding(
+                      padding: const EdgeInsets.only(bottom: 5, left: 8),
+                      child: Text(
+                        'ที่อยู่ :  ${orderModels[index].addressBuyer}',
+                        maxLines: 4,style: Myconstant().h3Style(),
+                      )),
                 ),
               ],
             ),

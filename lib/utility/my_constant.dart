@@ -5,7 +5,7 @@ class Myconstant {
   // General
   static String appName = 'TU2HAND';
   static String domain =
-      'https://457e-2405-9800-bc02-2945-3565-6ad7-7af0-e8c3.ngrok.io';
+      'https://7dfe-2403-6200-8883-62bd-3d34-1895-b9b6-5890.ngrok.io';
   static String urlQRcode = 'https://promptpay.io/0612019351.png';
 
   String keyId = 'id';
@@ -32,6 +32,8 @@ class Myconstant {
   static String image7 = 'images/image7.png';
   static String image8 = 'images/image8.jpg';
   static String image9 = 'images/image9.jpg';
+  static String image10 = 'images/image10.png';
+  static String image11 = 'images/image11.png';
   static String avatar = 'images/avatar.png';
   static String promtpayImg = 'images/promptpay.png';
 

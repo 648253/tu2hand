@@ -121,8 +121,8 @@ class _ShowProductSellerState extends State<ShowProductSeller> {
                       title: productModels[index].namePd,
                       textStyle: Myconstant().h2Style()),
                   Container(
-                    width: constraints.maxWidth * 0.5,
-                    height: constraints.maxWidth * 0.4,
+                    width: constraints.maxWidth * 0.4,
+                    height: constraints.maxWidth * 0.3,
                     child: CachedNetworkImage(
                       fit: BoxFit.cover,
                       imageUrl: createUrl(productModels[index].imagesPd),
@@ -144,7 +144,7 @@ class _ShowProductSellerState extends State<ShowProductSeller> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   ShowTitle(
-                      title: 'Price ${productModels[index].pricePd} THB',
+                      title: 'ราคา ฿${Myconstant().moneyFormat(productModels[index].pricePd)} ',
                       textStyle: Myconstant().h2Style()),
                   ShowTitle(
                       title: cutWord(productModels[index].detailPd),
